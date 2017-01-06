@@ -77,6 +77,9 @@ namespace DouduckGame {
 				if (m_oCurrentState[i].AtStateBegin) {
 					m_oCurrentState[i].TouchStateBegin();
 					m_oCurrentState[i].StateBegin();
+					if (m_oCurrentState == null) {
+						return;
+					}
 				}
 				m_oCurrentState[i].StateUpdate();
 			}

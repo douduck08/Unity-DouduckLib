@@ -31,6 +31,7 @@ namespace DouduckGame {
 
 		public void Terminate() {
 			m_GameStateController.Terminate();
+			m_GameStateController = new AdvancedGameStateController ();
 		}
 
 		public void TransTo(int iLevel, IHierarchicalState oState, string sSceneName = "", bool bReload = false) {
