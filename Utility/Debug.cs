@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+#if DEBUG_SWITCH
 public static class Debug {
 	public static bool DebugMode = false;
 
@@ -22,4 +23,4 @@ public static class Debug {
 		}
 	}
 }
-
+#endif

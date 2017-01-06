@@ -4,7 +4,9 @@ using System.Collections;
 
 namespace DouduckGame {
 	public sealed class DouduckGameCore : MonoBehaviour {
-
+		
+		[Header("You can add \"DEBUG_SWITCH\" into define symbol.")]
+		[Tooltip("To use DebugMode switch, you need to add \"DEBUG_SWITCH\" into define symbol.")]
 		public bool DebugMode = false;
 		public bool ScreenNeverSleep = false;
 		public int TargetFramerate = 60;
@@ -23,7 +25,11 @@ namespace DouduckGame {
 				Object.Destroy(this);
 			} else {
 				m_bIsInitialized = true;
+
+				#if DEBUG_SWITCH
 				Debug.DebugMode = this.DebugMode;
+				#endif
+
 				Random.seed = System.DateTime.Now.Millisecond;
 				if (ScreenNeverSleep) {
 					Screen.sleepTimeout = SleepTimeout.NeverSleep;
