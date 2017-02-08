@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace DouduckGame {
-	public sealed class GameSystemManager {
+	public sealed class GameSystemMonoManager {
 
 		private bool m_bIsInitialized = false;
 
@@ -12,7 +12,7 @@ namespace DouduckGame {
 		private Dictionary<Type, IGameSystemMono> m_GameSystemList;
 
 		// Initializaion method
-		public GameSystemManager(GameObject oContainer) {
+		public GameSystemMonoManager (GameObject oContainer) {
 			m_oContainer = oContainer;
 			GameObject.DontDestroyOnLoad(m_oContainer);
 
@@ -33,13 +33,15 @@ namespace DouduckGame {
 		}
 
 		// Functional method
-		public void AddSystem<T> () where T : IGameSystemMono {
+		public T AddSystem<T> () where T : IGameSystemMono {
 			if (m_GameSystemList.ContainsKey(typeof(T))) {
 				Debug.LogError("[GameSystemManager] There was a " + typeof(T).Name);
+				return m_GameSystemList [typeof(T)] as T;
 			} else {
-				T gameSys_ = m_oContainer.AddComponent<T> ();
+                T gameSys_ = m_oContainer.AddComponent<T> ();
 				gameSys_.StartGameSystem ();
 				m_GameSystemList.Add(gameSys_.GetType(), gameSys_);
+                return gameSys_;
 			}
 		}
 

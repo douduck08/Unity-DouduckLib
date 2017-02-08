@@ -21,12 +21,29 @@ namespace DouduckGame {
 			}
 		}
 
-		public event Action<GameObject, Vector2> OnClick;
-		public event Action<GameObject, string> OnButtonClick;
-		public event Action<GameObject, int, float> OnDrag;
-		public event Action<GameObject, int, float> OnEndDrag;
+        public event Action<GameObject, Vector2> OnClick = null;
+        public event Action<GameObject, string> OnButtonClick = null;
+        public event Action<GameObject, float, float> OnEndDrag = null;
 
-		public void Active() {
+        public void Click (Vector2 pos) {
+            if (OnClick != null) {
+                OnClick (this.gameObject, pos);
+            }
+        }
+
+        public void ButtonClick (string name) {
+            if (OnButtonClick != null) {
+                OnButtonClick (this.gameObject, name);
+            }
+        }
+
+        public void EndDrag (float deltaX, float deltaY) {
+            if (OnEndDrag != null) {
+                OnEndDrag (this.gameObject, deltaX, deltaY);
+            }
+        }
+
+        public void Active() {
 			this.gameObject.SetActive(true);
 			m_bActive = true;
 			OnShow();

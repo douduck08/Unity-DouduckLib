@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using System.Collections;
 
 namespace DouduckGame {
+    [AddComponentMenu("DouduckGame/DouduckGameCore")]
 	public sealed class DouduckGameCore : MonoBehaviour {
 		
 		[Header("You can add \"DEBUG_SWITCH\" into define symbol.")]
@@ -16,7 +17,7 @@ namespace DouduckGame {
 
 		public static GameObject InstanceGameObject;
 
-		private static GameSystemManager m_SystemManager;
+		private static GameSystemMonoManager m_SystemManager;
 		private static bool m_bIsInitialized = false;
 
 		private void Awake () {
@@ -42,7 +43,7 @@ namespace DouduckGame {
 				GameObject.DontDestroyOnLoad(this.gameObject);
 
 				InstanceGameObject = this.gameObject;
-				m_SystemManager = new GameSystemManager (InstanceGameObject);
+				m_SystemManager = new GameSystemMonoManager (InstanceGameObject);
 
 				// *** Show System Infomation ***
 				Utility.SystemInfomation.ShowInfomation();
@@ -60,8 +61,8 @@ namespace DouduckGame {
 		}
 
 		// *** System manager method ***
-		public static void AddSystem<T> () where T : IGameSystemMono {
-			m_SystemManager.AddSystem<T>();
+		public static T AddSystem<T> () where T : IGameSystemMono {
+			return m_SystemManager.AddSystem<T>();
 		}
 
 		public static void RemoveSystem<T> () where T : IGameSystemMono {
