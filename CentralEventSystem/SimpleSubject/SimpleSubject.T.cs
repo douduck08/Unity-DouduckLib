@@ -4,24 +4,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckGame {
-    public abstract class EventSubjectBase {
+    public class SimpleSubject<T> where T : struct {
 
-        protected bool m_bUseMultipleEventId = false;
-        protected List<EventObserver> m_Observers = new List<EventObserver> ();
-        private Dictionary<int, Action<int, EventArgs>> m_Callbacks = new Dictionary<int, Action<int, EventArgs>> ();
+        protected List<SimpleObserver<T>> m_Observers = new List<SimpleObserver<T>> ();
+        private Dictionary<int, Action<int, T>> m_Callbacks = new Dictionary<int, Action<int, T>> ();
 
         public bool CheckObserver (int iEventId) {
             return m_Callbacks.ContainsKey (iEventId);
         }
 
-        public virtual EventObserver RegisterCallback (int iEventId, Action<int, EventArgs> observerCallback) {
+        public virtual SimpleObserver<T> RegisterObserver (int iEventId, Action<int, T> observerCallback) {
             AddCallback (iEventId, observerCallback);
-            EventObserver newObserver_ = new EventObserver (iEventId, observerCallback);
+            SimpleObserver<T> newObserver_ = new SimpleObserver<T> (iEventId, observerCallback);
             m_Observers.Add (newObserver_);
             return newObserver_;
         }
 
-        public virtual void UnregisterCallback (int iEventId, Action<int, EventArgs> observerCallback) {
+        public virtual void UnregisterObserver (int iEventId, Action<int, T> observerCallback) {
             RemoveCallback (iEventId, observerCallback);
             for (int i = m_Observers.Count - 1; i >= 0; i--) {
                 if (m_Observers[i].EventId == iEventId && m_Observers[i].Callback == observerCallback) {
@@ -31,27 +30,14 @@ namespace DouduckGame {
             }
         }
 
-        public virtual void Notify (int iEventId, EventArgs eventArgs) {
+        public virtual void Notify (int iEventId, T args) {
             // Debug.Log (string.Format ("[IGameEventGroup] Notify {0:}, Event Id = {1:}", this.GetType().Name, iEventId));
-            if (m_bUseMultipleEventId) {
-                foreach (int Key in m_Callbacks.Keys) {
-                    if ((Key & iEventId) == iEventId) {
-                        m_Callbacks[Key] (iEventId, eventArgs);
-                    }
-                }
-            } else {
-                if (m_Callbacks.ContainsKey (iEventId)) {
-                    m_Callbacks[iEventId] (iEventId, eventArgs);
-                }
+            if (m_Callbacks.ContainsKey (iEventId)) {
+                m_Callbacks[iEventId] (iEventId, args);
             }
         }
 
         public virtual void KillObserverByEventId (int iEventId) {
-            for (int i = m_Observers.Count - 1; i >= 0; i--) {
-                if (m_Observers[i].EventId == iEventId) {
-                    m_Observers.RemoveAt (i);
-                }
-            }
             if (m_Callbacks.ContainsKey (iEventId)) {
                 m_Callbacks.Remove (iEventId);
             }
@@ -76,11 +62,10 @@ namespace DouduckGame {
         }
 
         public virtual void KillAllObserver () {
-            m_Observers.Clear ();
             m_Callbacks.Clear ();
         }
 
-        protected void AddCallback (int iEventId, Action<int, EventArgs> observerCallback) {
+        protected void AddCallback (int iEventId, Action<int, T> observerCallback) {
             if (m_Callbacks.ContainsKey (iEventId)) {
                 m_Callbacks[iEventId] += observerCallback;
             } else {
@@ -88,7 +73,7 @@ namespace DouduckGame {
             }
         }
 
-        protected void RemoveCallback (int iEventId, Action<int, EventArgs> observerCallback) {
+        protected void RemoveCallback (int iEventId, Action<int, T> observerCallback) {
             if (m_Callbacks.ContainsKey (iEventId)) {
                 m_Callbacks[iEventId] -= observerCallback;
                 if (m_Callbacks[iEventId] == null) {
