@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using System.Collections;
 
 namespace DouduckGame {
+    [DisallowMultipleComponent]
     [AddComponentMenu("DouduckGame/DouduckGameCore")]
 	public sealed class DouduckGameCore : MonoBehaviour {
 		

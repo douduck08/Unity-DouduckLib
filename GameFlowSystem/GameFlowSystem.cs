@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckGame {
+    [DisallowMultipleComponent]
+    [AddComponentMenu("DouduckGame/GameSystemMono/GameFlowSystem")]
 	public class GameFlowSystem : IGameSystemMono {
 
 		public System.Type Test;

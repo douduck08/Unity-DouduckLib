@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace DouduckGame {
+    [DisallowMultipleComponent]
+    [AddComponentMenu("DouduckGame/GameSystemMono/GUISystem")]
 	public sealed class GUISystem : IGameSystemMono {
 
 		private List<IGUIUnit> m_UIUnitList;

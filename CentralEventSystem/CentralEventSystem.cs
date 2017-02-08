@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckGame {
+    [DisallowMultipleComponent]
+    [AddComponentMenu("DouduckGame/GameSystemMono/CentralEventSystem")]
     public sealed class CentralEventSystem : IGameSystemMono {
 
         private Dictionary<Type, EventSubjectBase> m_SubjectDictionary = null;

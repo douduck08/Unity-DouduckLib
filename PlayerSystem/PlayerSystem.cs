@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace DouduckGame {
+    [DisallowMultipleComponent]
+    [AddComponentMenu("DouduckGame/GameSystemMono/PlayerSystem")]
 	public sealed class PlayerSystem : IGameSystemMono {
 		
 		public delegate void PlayerVisitor(IPlayer player);
