@@ -4,9 +4,8 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace DouduckGame {
-	public delegate void AccepterDelegate(TcpClient oClient);
-	public abstract class IAccepter {
+namespace DouduckGame.Network.Dev {
+	public abstract class Accepter {
 
 		public string Name;
 		protected IPAddress m_LocalIPAddress;
@@ -26,7 +25,7 @@ namespace DouduckGame {
 			}
 		}
 
-		public IAccepter(string sName, string sLocalIP, int iListenPort) {
+		public Accepter(string sName, string sLocalIP, int iListenPort) {
 			m_LocalIPAddress = IPAddress.Parse(sLocalIP);
 			m_oListener = new TcpListener(m_LocalIPAddress, iListenPort);
 
