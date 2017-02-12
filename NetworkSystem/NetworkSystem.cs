@@ -16,34 +16,14 @@ public enum eConnectorIndex {
 namespace DouduckGame.Network {
     public class NetworkSystem : IGameSystemMono {
 
-        private bool m_bHasError = false;
-        public bool HasError {
-            get {
-                return m_bHasError;
-            }
-        }
-        private eNetworkError m_eErrorCode = eNetworkError.NONE;
-        public eNetworkError ErrorCode {
-            get {
-                return m_eErrorCode;
-            }
-            protected set {
-                m_bHasError = true;
-                m_eErrorCode = value;
-            }
-        }
-
-
-        protected IAccepter m_Accepter;
+        protected AsyncAccepter m_Accepter;
         protected ConnecterHandler m_ConnecterHandler = new ConnecterHandler ();
         protected PacketHandler m_PacketHandler = new PacketHandler ();
 
         protected List<AsyncConnector> m_ConnectorBuffer = null;
-        protected static ReceiveDelegate m_ReceiveCallBack = null;
 
         public override void StartGameSystem () {
             m_ConnectorBuffer = new List<AsyncConnector> ();
-            m_ReceiveCallBack = new ReceiveDelegate (m_PacketHandler.NewPacket);
         }
 
         public override void DestoryGameSystem () {
@@ -54,14 +34,19 @@ namespace DouduckGame.Network {
             m_PacketHandler.ParseAllPacket ();
         }
 
-        public void SettingPacketHandler (PacketPackager packager, PacketParser parser) {
-            m_ConnecterHandler.SetReceiveCallback (m_ReceiveCallBack);
+        public void SetCallback(ReceiveCallback receiveCallback, ConnectionErrorCallback errorCallback) {
+            m_ConnecterHandler.SetCallback(receiveCallback, errorCallback);
+        }
+
+        public void SettingPacketHandler (PacketPackager packager, PacketParser[] parser) {
             m_PacketHandler.SetPacketPackager (packager);
-            m_PacketHandler.SetPacketParser (parser);
+            for (int i = 0; i < parser.Length; i++) {
+                m_PacketHandler.AddPacketParser(parser[i]);
+            }
         }
 
         // *** Accepter ***
-        public void SetAccepter (IAccepter oAccepter) {
+        public void SetAccepter (AsyncAccepter oAccepter) {
             m_Accepter = oAccepter;
         }
 
@@ -82,20 +67,20 @@ namespace DouduckGame.Network {
         }
 
         // *** Connector ***
-        public void AddConnector (uint index, IConnector oConnector) {
+        public void AddConnector (uint index, AsyncConnector oConnector) {
             m_ConnecterHandler.AddConnector (index, oConnector);
         }
 
-        public IConnector GetConnector (uint index) {
+        public AsyncConnector GetConnector (uint index) {
             return m_ConnecterHandler.GetConnector (index);
         }
 
-        public void AcceptConnection (uint index, IConnector oConnector, TcpClient oClient) {
-            m_ConnecterHandler.AcceptConnection (index, oConnector, oClient);
+        public void AcceptConnection (uint index, string sName, TcpClient oClient) {
+            m_ConnecterHandler.AcceptConnection (index, sName, oClient);
         }
 
-        public void NewConnection (uint index, IConnector oConnector, string sIP, int iPort) {
-            m_ConnecterHandler.NewConnection (index, oConnector, sIP, iPort);
+        public void NewConnection (uint index, string sName, string sIP, int iPort, ConnectionErrorCallback connectCallback) {
+            m_ConnecterHandler.NewConnection(index, sName, sIP, iPort, connectCallback);
         }
 
         public void RemoveConnection (uint index) {

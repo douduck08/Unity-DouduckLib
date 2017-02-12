@@ -41,12 +41,8 @@ namespace DouduckGame.Network {
 		private float m_fLastReceive;  // from Time.realtimeSinceStartup
 
         private ConnectionErrorCallback m_ErrorCallback = null;
+        private ConnectionErrorCallback m_ConnectCallback = null;
         private ReceiveCallback m_ReceiveCallback = null;
-
-		public AsyncConnector(string sName, ConnectionErrorCallback errorCallback) {
-            Name = sName;
-            m_ErrorCallback = errorCallback;
-        }
 
         public AsyncConnector (string sName, ReceiveCallback receiveCallback, ConnectionErrorCallback errorCallback) {
             Name = sName;
@@ -54,17 +50,18 @@ namespace DouduckGame.Network {
             m_ErrorCallback = errorCallback;
         }
 
-        public void Connect (string sIP, int iPort, System.Action connectCallback) {
+        public void Connect (string sIP, int iPort, ConnectionErrorCallback connectCallback) {
             if (IsAlive) {
                 Debug.LogWarning ("[Connector] " + Name + ": Connection is already alive.");
                 return;
             }
 
+            m_ConnectCallback = connectCallback;
             try {
                 m_sIP = sIP;
                 m_iPort = iPort;
                 Debug.Log ("[Connector] " + Name + ": Try to connect (IP: " + sIP + ")");
-                Client.BeginConnect (sIP, iPort, new System.AsyncCallback (EndConnect), connectCallback);
+                Client.BeginConnect (sIP, iPort, new System.AsyncCallback (EndConnect), null);
             } catch (SocketException ex) {
                 Debug.LogError ("[Connector] " + Name + ": Connect() Fail, " + ex.ToString ());
                 ErrorNotify (NetworkError.CONNECT_FAILED);
@@ -96,12 +93,11 @@ namespace DouduckGame.Network {
             }
         }
 
-        public void Receive (ReceiveCallback receiveCallback, ConnectionCallback statusCallback) {
+        public void Receive (ReceiveCallback receiveCallback) {
             if (!IsAlive) {
                 Debug.LogError ("[Connector] " + Name + ": Receive() Fail, TcpClient was closed.");
                 return;
             }
-            m_RecieveStatusCallback = statusCallback;
             m_ReceiveCallback = receiveCallback;
             try {
                 Client.GetStream ().BeginRead (ReadBuffer, 0, NetworkUtil.BUFFER_SIZE, new System.AsyncCallback (EndReceive), null);
@@ -110,12 +106,11 @@ namespace DouduckGame.Network {
             }
         }
 
-        public void Send (byte[] aucPacket, ConnectionCallback statusCallback) {
+        public void Send (byte[] aucPacket) {
             if (!IsAlive) {
                 Debug.LogError ("[Connector] " + Name + ": Send() Fail, TcpClient was closed.");
                 return;
             }
-            m_SendStatusCallback = statusCallback;
 
             if (!IsAlive) {
                 Debug.LogError ("[Connector] " + Name + ": Send() Fail, TcpClient was closed.");
@@ -130,7 +125,7 @@ namespace DouduckGame.Network {
         }
 
         public void Reconnect () {
-            Connect (m_sIP, m_iPort, m_ConnectStatusCallback);
+            Connect (m_sIP, m_iPort, m_ConnectCallback);
         }
 
         private void ErrorNotify(NetworkError error) {
@@ -146,14 +141,14 @@ namespace DouduckGame.Network {
                 Client.EndConnect (asyn);
                 if (IsAlive) {
                     Debug.Log ("[Connector] " + Name + ": Connect Success, start Receive Callback");
-                    NotifyConnectResult ();
-                    Receive (m_ReceiveCallback, m_RecieveStatusCallback);
+                    m_ConnectCallback(Name, NetworkError.NONE);
+                    Receive (m_ReceiveCallback);
                 } else {
-                    NotifyConnectResult (false);
+                    m_ConnectCallback(Name, NetworkError.CONNECT_FAILED);
                 }
             } catch (System.Exception ex) {
                 Debug.LogError ("[Connector Error] " + Name + ": EndConnect() Fail, " + ex.ToString ());
-                NotifyConnectResult (false);
+                m_ConnectCallback(Name, NetworkError.CONNECT_FAILED);
             }
         }
 
@@ -163,6 +158,7 @@ namespace DouduckGame.Network {
                 oStream_.EndWrite (asyn);
             } catch (System.Exception ex) {
                 Debug.LogError ("[Connector Error] " + Name + ": EndSend() Fail, " + ex.ToString ());
+                m_ErrorCallback(Name, NetworkError.SEND_FAILED);
                 Disconnect ();
             }
 		}
@@ -181,14 +177,14 @@ namespace DouduckGame.Network {
 					m_ReceiveCallback(CoreSocket, ReadBuffer);
 				} else {
 					Debug.LogError("[Client Error] " + Name + ": null socket");
-                    NotifyReceiveResult (false);
+                    m_ErrorCallback(Name, NetworkError.RECEIVE_FAILED);
                     Disconnect ();
                 }
-                Receive (m_ReceiveCallback, m_RecieveStatusCallback);
+                Receive (m_ReceiveCallback);
             }
 			catch (System.Exception ex) {
 				Debug.LogError("[Client Error] " + Name + ": EndReceive() Fail, " + ex.ToString());
-                NotifyReceiveResult (false);
+                m_ErrorCallback(Name, NetworkError.RECEIVE_FAILED);
                 Disconnect ();
 			}
 		}

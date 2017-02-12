@@ -36,15 +36,15 @@ namespace DouduckGame.Network.Dev {
             }
         }
 
-        protected ConnectionCallback m_ConnectStatusCallback = null;
-        protected ConnectionCallback m_RecieveStatusCallback = null;
-        protected ConnectionCallback m_SendStatusCallback = null;
+        protected ConnectionErrorCallback m_ConnectStatusCallback = null;
+        protected ConnectionErrorCallback m_RecieveStatusCallback = null;
+        protected ConnectionErrorCallback m_SendStatusCallback = null;
 
         public Connector (string sName) {
             Name = sName;
         }
 
-        public void Connect (string sIP, int iPort, ConnectionCallback statusCallback) {
+        public void Connect (string sIP, int iPort, ConnectionErrorCallback statusCallback) {
             if (IsAlive) {
                 Debug.LogWarning ("[Connector] " + Name + ": Connection is already alive.");
                 return;
@@ -69,7 +69,7 @@ namespace DouduckGame.Network.Dev {
             }
         }
 
-        public void Receive (ReceiveCallback receiveCallback, ConnectionCallback statusCallback) {
+        public void Receive (ReceiveCallback receiveCallback, ConnectionErrorCallback statusCallback) {
             if (!IsAlive) {
                 Debug.LogError ("[Connector] " + Name + ": Receive() Fail, TcpClient was closed.");
                 return;
@@ -78,7 +78,7 @@ namespace DouduckGame.Network.Dev {
             DoReceive (receiveCallback);
         }
 
-        public void Send (byte[] aucPacket, ConnectionCallback statusCallback) {
+        public void Send (byte[] aucPacket, ConnectionErrorCallback statusCallback) {
             if (!IsAlive) {
                 Debug.LogError ("[Connector] " + Name + ": Send() Fail, TcpClient was closed.");
                 return;
@@ -96,27 +96,27 @@ namespace DouduckGame.Network.Dev {
         protected void NotifyConnectResult(bool success = true) {
             if (m_ConnectStatusCallback == null) return;
             if (success) {
-                m_ConnectStatusCallback (Name, ConnectionStatus.CONNECT_SUCCESS);
+                //m_ConnectStatusCallback (Name, NetworkError.CONNECT_SUCCESS);
             } else {
-                m_ConnectStatusCallback (Name, ConnectionStatus.CONNECT_FAILED);
+                //m_ConnectStatusCallback (Name, NetworkError.CONNECT_FAILED);
             }
         }
 
         protected void NotifyReceiveResult (bool success = true) {
             if (m_ConnectStatusCallback == null) return;
             if (success) {
-                m_ConnectStatusCallback (Name, ConnectionStatus.RECEIVE_SUCCESS);
+                //m_ConnectStatusCallback (Name, NetworkError.RECEIVE_SUCCESS);
             } else {
-                m_ConnectStatusCallback (Name, ConnectionStatus.RECEIVE_FAILED);
+                //m_ConnectStatusCallback (Name, NetworkError.RECEIVE_FAILED);
             }
         }
 
         protected void NotifySendResult (bool success = true) {
             if (m_ConnectStatusCallback == null) return;
             if (success) {
-                m_ConnectStatusCallback (Name, ConnectionStatus.SEND_SUCCESS);
+                //m_ConnectStatusCallback (Name, NetworkError.SEND_SUCCESS);
             } else {
-                m_ConnectStatusCallback (Name, ConnectionStatus.SEND_FAILED);
+                //m_ConnectStatusCallback (Name, NetworkError.SEND_FAILED);
             }
         }
     }

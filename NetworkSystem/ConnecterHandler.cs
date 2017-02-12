@@ -15,18 +15,21 @@ namespace DouduckGame.Network {
                 return m_Connectors;
             }
         }
-        private ReceiveDelegate m_ReceiveCallback = null;
+
+        private ConnectionErrorCallback m_ErrorCallback = null;
+        private ReceiveCallback m_ReceiveCallback = null;
 
         // *** Connector ***
-        public void AddConnector (uint index, IConnector oConnector) {
+        public void AddConnector (uint index, AsyncConnector oConnector) {
             Connectors.Add (index, oConnector);
         }
 
-        public void SetReceiveCallback (ReceiveDelegate dReceiveCallback) {
-            m_ReceiveCallback = dReceiveCallback;
+        public void SetCallback (ReceiveCallback receiveCallback, ConnectionErrorCallback errorCallback) {
+            m_ReceiveCallback = receiveCallback;
+            m_ErrorCallback = errorCallback;
         }
 
-        public IConnector GetConnector (uint index) {
+        public AsyncConnector GetConnector (uint index) {
             if (Connectors.ContainsKey (index)) {
                 return Connectors[index];
             } else {
@@ -34,14 +37,17 @@ namespace DouduckGame.Network {
             }
         }
 
-        public void AcceptConnection (uint index, IConnector oConnector, TcpClient oClient) {
-            AddConnector (index, oConnector);
-            oConnector.Accept (oClient, m_ReceiveCallback);
+        public void AcceptConnection (uint index, string sName, TcpClient oClient) {
+            AsyncConnector connector_ = new AsyncConnector(sName, m_ReceiveCallback, m_ErrorCallback);
+            AddConnector (index, connector_);
+            connector_.Accept (oClient);
+            connector_.Receive(m_ReceiveCallback);
         }
 
-        public void NewConnection (uint index, IConnector oConnector, string sIP, int iPort) {
-            AddConnector (index, oConnector);
-            oConnector.Connect (sIP, iPort, m_ReceiveCallback);
+        public void NewConnection (uint index, string sName, string sIP, int iPort, ConnectionErrorCallback connectCallback) {
+            AsyncConnector connector_ = new AsyncConnector(sName, m_ReceiveCallback, m_ErrorCallback);
+            AddConnector(index, connector_);
+            connector_.Connect (sIP, iPort, connectCallback);
         }
 
         public void RemoveConnection (uint index) {

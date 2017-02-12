@@ -1,18 +1,60 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Net;
 using System.Net.Sockets;
 
-namespace DouduckGame {
-	public class AsyncAccepter : IAccepter {
+namespace DouduckGame.Network {
+	public class AsyncAccepter {
+        public string Name;
+        protected IPAddress m_LocalIPAddress;
+        protected TcpListener m_oListener = null;
+        protected TcpListener Listener {
+            get {
+                if (m_oListener == null) {
+                    Debug.LogError("[Accepter] Listener is null");
+                }
+                return m_oListener;
+            }
+        }
+        protected bool m_bActive;
+        public bool IsActive {
+            get {
+                return m_bActive;
+            }
+        }
 
-		private AccepterDelegate m_AcceptCallback = null;
-		public AsyncAccepter(string sName, string sLocalIP, int iListenPort, AccepterDelegate dAcceptCallback) : base(sName, sLocalIP, iListenPort)
-		{
-			m_AcceptCallback = dAcceptCallback;
-		}
+        private AccepterCallback m_AcceptCallback = null;
 
-		// private functions: async delegate to accept client
-		protected override void WaitForClientConnect() {
+
+        public AsyncAccepter(string sName, string sLocalIP, int iListenPort, AccepterCallback dAcceptCallback) {
+            m_LocalIPAddress = IPAddress.Parse(sLocalIP);
+            m_oListener = new TcpListener(m_LocalIPAddress, iListenPort);
+
+            Listener.ExclusiveAddressUse = false;
+            m_bActive = false;
+            Debug.Log("[Accepter] " + Name + ": Ready to work...(" + sLocalIP + ":" + iListenPort + ")");
+
+            m_AcceptCallback = dAcceptCallback;
+        }
+
+        public void StartListen() {
+            if (!IsActive) {
+                Listener.Start();
+                m_bActive = true;
+                Debug.Log("[Accepter] " + Name + ": Start to listen");
+                WaitForClientConnect();
+            }
+        }
+
+        public void StopListen() {
+            if (IsActive) {
+                Listener.Stop();
+                m_bActive = false;
+                Debug.Log("[Accepter] " + Name + ": Stop listening");
+            }
+        }
+
+        protected void WaitForClientConnect() {
 			Listener.BeginAcceptTcpClient(new System.AsyncCallback(OnClientConnect), null);
 		}
 

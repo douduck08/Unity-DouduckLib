@@ -5,8 +5,8 @@ using System.Net.Sockets;
 
 namespace DouduckGame.Network {
     public abstract class PacketParser {
-        private Dictionary<uint, PacketParseCallback> m_oParsers = new Dictionary<uint, PacketParseCallback> ();
-        protected void AddParser (uint uiIndex, PacketParseCallback parseCallback) {
+        private Dictionary<uint, ReceiveCallback> m_oParsers = new Dictionary<uint, ReceiveCallback> ();
+        protected void AddParser (uint uiIndex, ReceiveCallback parseCallback) {
             if (m_oParsers.ContainsKey (uiIndex)) {
                 Debug.LogError ("[PacketParser] AddParser: Index conflict");
             } else {
