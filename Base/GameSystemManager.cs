@@ -35,7 +35,7 @@ namespace DouduckGame {
 		// Functional method
 		public T AddSystem<T> () where T : IGameSystemMono {
 			if (m_GameSystemList.ContainsKey(typeof(T))) {
-				Debug.LogError("[GameSystemManager] There was a " + typeof(T).Name);
+                Util.UnityConsole.LogError("[GameSystemManager] There was a " + typeof(T).Name);
 				return m_GameSystemList [typeof(T)] as T;
 			} else {
                 T gameSys_ = m_oContainer.AddComponent<T> ();
@@ -52,7 +52,7 @@ namespace DouduckGame {
 				gameSys_.DestoryGameSystem();
 				GameObject.Destroy(gameSys_);
 			} else {
-				Debug.LogError("[GameSystemManager] There was no " + typeof(T).Name);
+                Util.UnityConsole.LogError("[GameSystemManager] There was no " + typeof(T).Name);
 			}
 		}
 
@@ -60,7 +60,7 @@ namespace DouduckGame {
 			if (m_GameSystemList.ContainsKey(typeof(T))) {
 				m_GameSystemList [typeof(T)].enabled = true;
 			} else {
-				Debug.LogError ("[GameSystemManager] There was no " + typeof(T).Name);
+                Util.UnityConsole.LogError ("[GameSystemManager] There was no " + typeof(T).Name);
 			}
 		}
 
@@ -68,7 +68,7 @@ namespace DouduckGame {
 			if (m_GameSystemList.ContainsKey(typeof(T))) {
 				m_GameSystemList [typeof(T)].enabled = false;
 			} else {
-				Debug.LogError ("[GameSystemManager] There was no " + typeof(T).Name);
+                Util.UnityConsole.LogError ("[GameSystemManager] There was no " + typeof(T).Name);
 			}
 		}
 
@@ -76,7 +76,7 @@ namespace DouduckGame {
 			if (m_GameSystemList.ContainsKey(typeof(T))) {
 				return m_GameSystemList [typeof(T)] as T;
 			} else {
-				Debug.LogError ("[GameSystemManager] There was no " + typeof(T).Name);
+                Util.UnityConsole.LogError ("[GameSystemManager] There was no " + typeof(T).Name);
 				return null;
 			}
 		}

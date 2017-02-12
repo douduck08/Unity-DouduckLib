@@ -20,14 +20,14 @@ namespace DouduckGame {
 
 		public void Start(IHierarchicalState oState) {
 			if (m_bTerminated) {
-				Debug.LogError("[HStateController] has been terminated");
+                Util.UnityConsole.LogError("[HStateController] has been terminated");
 				return;
 			}
 			if (m_bStarted) {
-				Debug.LogError("[HStateController] has been started");
+                Util.UnityConsole.LogError("[HStateController] has been started");
 				return;
 			}
-			Debug.Log("[HStateController] Start: " + oState.ToString());
+            Util.UnityConsole.Log("[HStateController] Start: " + oState.ToString());
 			m_bStarted = true;
 			m_oCurrentState.Add(oState);
 			m_oCurrentState[0].SetProperty(this, 0);
@@ -43,19 +43,19 @@ namespace DouduckGame {
 
 		public void TransTo(int iLevel, IHierarchicalState oState) {
 			if (m_bTerminated) {
-				Debug.LogError("[StateController] has been terminated");
+                Util.UnityConsole.LogError("[StateController] has been terminated");
 				return;
 			}
 			if (!m_bStarted) {
-				Debug.LogError("[StateController] need to be started first");
+                Util.UnityConsole.LogError("[StateController] need to be started first");
 				return;
 			}
 			if (iLevel > m_oCurrentState.Count) {
-				Debug.LogError("[StateController] Level is too big");
+                Util.UnityConsole.LogError("[StateController] Level is too big");
 				return;
 			}
 
-			Debug.Log(string.Format("[StateController] Level {0:} transTo: {1:}", iLevel, oState.ToString()));
+            Util.UnityConsole.Log(string.Format("[StateController] Level {0:} transTo: {1:}", iLevel, oState.ToString()));
 			if (iLevel == m_oCurrentState.Count) {
 				m_oCurrentState.Add(oState);
 				m_oCurrentState [iLevel].SetProperty(this, iLevel);

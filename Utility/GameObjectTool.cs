@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace DouduckGame.Utility
-{
-	public static class UnityTool
-	{
+namespace DouduckGame.Util {
+	public static class GameObjectTool {
 		public static GameObject FindGameobjectWithTag(string sTag) {
 			Debug.Log("[UnityTool] Find Gameobject with Tag: " + sTag);
 			GameObject go_ = GameObject.FindWithTag(sTag);
@@ -51,8 +49,5 @@ namespace DouduckGame.Utility
 			}
 			return oTf_.gameObject;
 		}
-
-
-		
 	}
 }

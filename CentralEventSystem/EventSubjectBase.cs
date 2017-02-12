@@ -32,7 +32,6 @@ namespace DouduckGame {
         }
 
         public virtual void Notify (int iEventId, EventArgs eventArgs) {
-            // Debug.Log (string.Format ("[IGameEventGroup] Notify {0:}, Event Id = {1:}", this.GetType().Name, iEventId));
             if (m_bUseMultipleEventId) {
                 foreach (int Key in m_Callbacks.Keys) {
                     if ((Key & iEventId) == iEventId) {

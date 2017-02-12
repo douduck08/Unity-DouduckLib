@@ -20,14 +20,14 @@ namespace DouduckGame {
 
 		public void Start(IState oState) {
 			if (m_bTerminated) {
-				Debug.LogError("[StateController] has been terminated");
+                Util.UnityConsole.LogError("[StateController] has been terminated");
 				return;
 			}
 			if (m_bStarted) {
-				Debug.LogError("[StateController] has been started");
+                Util.UnityConsole.LogError("[StateController] has been started");
 				return;
 			}
-			Debug.Log("[StateController] Start: " + oState.ToString());
+            Util.UnityConsole.Log("[StateController] Start: " + oState.ToString());
 			m_bStarted = true;
 			m_oCurrentState = oState;
 			m_oCurrentState.SetProperty(this);
@@ -43,14 +43,14 @@ namespace DouduckGame {
 
 		public void TransTo(IState oState) {
 			if (m_bTerminated) {
-				Debug.LogError("[StateController] has been terminated");
+                Util.UnityConsole.LogError("[StateController] has been terminated");
 				return;
 			}
 			if (!m_bStarted) {
-				Debug.LogError("[StateController] need to be started first");
+                Util.UnityConsole.LogError("[StateController] need to be started first");
 				return;
 			}
-			Debug.Log("[StateController] TransTo: " + oState.ToString());
+            Util.UnityConsole.Log("[StateController] TransTo: " + oState.ToString());
 			if (m_oCurrentState != null) {
 				m_oCurrentState.StateEnd();
 			}

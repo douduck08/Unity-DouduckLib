@@ -39,7 +39,7 @@ namespace DouduckGame {
 		public T GetGUIUnit<T>(string sUIName) where T : IGUIUnit {
 			IGUIUnit unit_ = m_UIUnitList.Find(p => p.Name == sUIName);
 			if (unit_ == null) {
-				Debug.LogError("[GUISystem] Find no UI named " + sUIName);
+                Util.UnityConsole.LogError("[GUISystem] Find no UI named " + sUIName);
 				return null;
 			} else {
 				return (T)unit_;
@@ -57,7 +57,7 @@ namespace DouduckGame {
 		public void Active(string sUIName) {
 			IGUIUnit unit_ = m_UIUnitList.Find(p => p.Name == sUIName);
 			if (unit_ == null) {
-				Debug.LogError("[GUISystem] Find no UI named " + sUIName);
+                Util.UnityConsole.LogError("[GUISystem] Find no UI named " + sUIName);
 			} else {
 				unit_.Active();
 			}
@@ -66,7 +66,7 @@ namespace DouduckGame {
 		public void Inactive(string sUIName) {
 			IGUIUnit unit_ = m_UIUnitList.Find(p => p.Name == sUIName);
 			if (unit_ == null) {
-				Debug.LogError("[GUISystem] Find no UI named " + sUIName);
+                Util.UnityConsole.LogError("[GUISystem] Find no UI named " + sUIName);
 			} else {
 				unit_.Inactive();
 			}

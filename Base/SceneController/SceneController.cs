@@ -35,7 +35,7 @@ namespace DouduckGame {
 		}
 
 		private void LoadSceneAsync(string sSceneName) {
-			Debug.Log(string.Format("[SceneController] Start Loading Scene<{0:}>", sSceneName));
+            Util.UnityConsole.Log(string.Format("[SceneController] Start Loading Scene<{0:}>", sSceneName));
 			m_bIsLoadingLevel = true;
 			m_fProgress = 0f;
 			if (m_ScenePipeline != null) {
@@ -54,7 +54,7 @@ namespace DouduckGame {
 				m_ScenePipeline.AfterSceneLoading ();
 			}
 			m_bIsLoadingLevel = false;
-			Debug.Log(string.Format("[SceneController] Loading Scene<{0:}> is done", sSceneName));
+            Util.UnityConsole.Log(string.Format("[SceneController] Loading Scene<{0:}> is done", sSceneName));
 		}
 	}
 }

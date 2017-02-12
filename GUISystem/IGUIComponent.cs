@@ -16,7 +16,7 @@ namespace DouduckGame {
 				if (m_UpperUnit == null) {
 					m_UpperUnit = transform.GetComponentInParent<IGUIUnit>();
 					if (m_UpperUnit == null) {
-						Debug.LogError(string.Format("[IGUIComponent] {0:}: UpperUnit was not found.", Name));
+                        Util.UnityConsole.LogError(string.Format("[IGUIComponent] {0:}: UpperUnit was not found.", Name));
 					}
 				}
 				return m_UpperUnit;
