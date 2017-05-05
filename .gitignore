@@ -1,14 +1,24 @@
-# unity ignore dir
+# Unity
 /[Bb]in/
+/[Bb]uild/
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
+*.meta
 
-# unity ignore file
+# Visual Studio / MonoDevelop
+.vs/
 *.csproj
 *.unityproj
 *.sln
 *.user
 *.userprefs
-*.meta
-*.tmp
+
+# Others
+.DS_Store*
+._*
+.Trashes
+*.[Tt][Mm][Pp]
+
+# Need include
+# !*.*.meta
