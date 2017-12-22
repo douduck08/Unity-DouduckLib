@@ -22,10 +22,10 @@ namespace DouduckLib.EventManager {
         private Dictionary<Type, SubjectBase> m_subjectDictionary = new Dictionary<Type, SubjectBase> ();
         private Dictionary<Type, SimpleSubjectBase> m_simpleSubjectDictionary = new Dictionary<Type, SimpleSubjectBase> ();
 
-        public static T GetSubject<T>() where T : SubjectBase, new() {
+        public static T GetSubject<T> () where T : SubjectBase, new() {
             Type type_ = typeof (T);
             if (instance.m_subjectDictionary.ContainsKey (type_)) {
-                return instance.m_subjectDictionary[type_] as T;
+                return (T)(instance.m_subjectDictionary[type_]);
             } else {
                 T subject_ = new T ();
                 instance.m_subjectDictionary.Add (type_, subject_);
@@ -33,10 +33,10 @@ namespace DouduckLib.EventManager {
             }
         }
 
-        private SimpleSubject<T> GetSimpleSubject<T>() where T : struct, IConvertible {
+        private SimpleSubject<T> GetSimpleSubject<T> () where T : struct, IConvertible {
             Type type_ = typeof (T);
             if (m_simpleSubjectDictionary.ContainsKey (type_)) {
-                return m_simpleSubjectDictionary[type_] as SimpleSubject<T>;
+                return (SimpleSubject<T>)(m_simpleSubjectDictionary[type_]);
             } else {
                 SimpleSubject<T> subject_ = new SimpleSubject<T> ();
                 m_simpleSubjectDictionary.Add (type_, subject_);
@@ -44,7 +44,7 @@ namespace DouduckLib.EventManager {
             }
         }
 
-        public static IDisposable SimpleSubscribe<T>(T eventCode, Action<T> observer) where T : struct, IConvertible {
+        public static IDisposable SimpleSubscribe<T> (T eventCode, Action<T> observer) where T : struct, IConvertible {
             return instance.GetSimpleSubject<T> ().Subscribe (eventCode, observer);
         }
 
