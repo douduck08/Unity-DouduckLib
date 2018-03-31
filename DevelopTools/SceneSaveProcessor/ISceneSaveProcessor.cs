@@ -1,3 +1,5 @@
-﻿public interface ISceneSaveProcessing {
-    void OnSceneSave ();
+﻿namespace DouduckLib {
+    public interface ISceneSaveProcessing {
+        void OnSceneSave ();
+    }
 }
