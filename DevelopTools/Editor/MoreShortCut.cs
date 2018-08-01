@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System;
+﻿using System;
+using System.IO;
 using UnityEngine;
 using UnityEditor;
 
@@ -20,13 +20,13 @@ namespace DouduckLibEditor {
         }
 
         [MenuItem ("Edit/CaptureScreenshot %k")]
-        public static void ScreenCapture () {
+        public static void CaptureScreenshot () {
             string path = Path.Combine (Application.dataPath, screenshotFilePath);
             if (!Directory.Exists (path)) {
                 Directory.CreateDirectory (path);
             }
             path = Path.Combine (path, DateTime.Now.ToString ("yyyyMMdd-HHmmss") + ".png");
-            Application.CaptureScreenshot (path);
+            ScreenCapture.CaptureScreenshot (path);
         }
     }
 }

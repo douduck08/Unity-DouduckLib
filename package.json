@@ -1,0 +1,8 @@
+{
+    "name": "com.douduck08.douduck-lib",
+    "displayName": "douduck lib",
+    "version": "0.0.1",
+    "unity": "2018.1",
+    "description": "Unity develop toolbox of douduck08.",
+    "dependencies": {}
+}
