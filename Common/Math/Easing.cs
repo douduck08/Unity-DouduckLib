@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckLib {
-	public partial class Easing {
-	    /* Standard Equation for Easing */
+    public class Easing {
+        /* Standard Equation for Easing */
         public static float Linear (float t) { return t; }
 
         public static float EaseInQuad (float t) { return t * t; }
@@ -79,5 +79,5 @@ namespace DouduckLib {
         }
         public static float EaseInOutBounce (float t) { return t < 0.5f ? EaseInBounce (t * 2f) * 0.5f : EaseOutBounce ((t * 2f) - 1f) * 0.5f + 0.5f; }
         public static float EaseOutInBounce (float t) { return t < 0.5f ? EaseOutBounce (t * 2f) * 0.5f : EaseInBounce ((t * 2f) - 1f) * 0.5f + 0.5f; }
-	}
+    }
 }

@@ -2,7 +2,7 @@
 using UnityEditor;
 using DouduckLib;
 
-namespace DouduckLibEditor {
+namespace DouduckLib.Editor {
     [CustomPropertyDrawer (typeof (ReadOnlyAttribute))]
     public class ReadOnlyDrawer : PropertyDrawer {
         public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {

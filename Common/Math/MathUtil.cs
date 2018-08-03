@@ -11,7 +11,7 @@ namespace DouduckLib {
         public static readonly float radToDeg = 180.0f / Mathf.PI;
         public static readonly float degToRad = Mathf.PI / 180.0f;
 
-        public float GetDirectionAngle (Vector2 vector) {
+        public float GetDirection (Vector2 vector) {
             if (vector.y >= 0) {
                 return Vector2.Angle (Vector2.right, vector);
             } else {

@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine;
 using DouduckLib;
 
-namespace DouduckLibEditor {
+namespace DouduckLib.Editor {
     public class SceneSaveProcessor : UnityEditor.AssetModificationProcessor {
         static string[] OnWillSaveAssets (string[] paths) {
             foreach (string path in paths) {
