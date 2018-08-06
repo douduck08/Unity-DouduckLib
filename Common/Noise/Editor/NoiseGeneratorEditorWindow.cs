@@ -17,7 +17,7 @@ namespace DouduckLib.Editor {
 
         SerializedObject serializedObject;
         SerializedProperty generatorProperty;
-        SerializedProperty textureProperty;
+        // SerializedProperty textureProperty;
 
         [MenuItem (EditorUtil.MenuItemPathRoot + "Noise Generator", false, EditorUtil.EditorWindows)]
         public static void ShowWindow () {
@@ -34,7 +34,7 @@ namespace DouduckLib.Editor {
 
                 serializedObject = new SerializedObject (this);
                 generatorProperty = serializedObject.FindProperty ("noiseGenerator");
-                textureProperty = serializedObject.FindProperty ("noiseTexture");
+                // textureProperty = serializedObject.FindProperty ("noiseTexture");
             }
         }
 
