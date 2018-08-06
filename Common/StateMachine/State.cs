@@ -5,10 +5,13 @@ using UnityEngine;
 
 namespace DouduckLib {
     public abstract class State : IState {
-        internal IStateController _stateController;
-        public IStateController stateController {
+        internal IStateController _controller;
+        public IStateController controller {
             get {
-                return _stateController;
+                return _controller;
+            }
+            set {
+                _controller = value;
             }
         }
 

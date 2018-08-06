@@ -1,6 +1,6 @@
 ﻿namespace DouduckLib {
     public interface IState {
-        IStateController stateController { get; }
+        IStateController controller { get; set; }
         bool isStarted { get; }
         bool isCompleted { get; }
         void StateUpdate ();

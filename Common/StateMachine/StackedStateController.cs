@@ -7,55 +7,48 @@ using UnityEngine;
 namespace DouduckLib {
     public sealed class StackedStateController : IStateController {
 
-        IState _currentState = null;
+        // IState _currentState = null;
+        Stack<IState> stateStack;
         public IState currentState {
             get {
-                return _currentState;
+                return stateStack.Peek ();
             }
         }
 
-        public StackedStateController () { }
+        public StackedStateController () {
+            stateStack = new Stack<IState> ();
+        }
         public StackedStateController (IState startState) {
+            stateStack = new Stack<IState> ();
             SetState (startState);
         }
 
         public void SetState (IState state) {
-            _currentState = state;
+            if (stateStack.Peek () != null) {
+                stateStack.Pop ();
+            }
+            if (state != null) {
+                state.controller = this;
+                stateStack.Push (state);
+            }
         }
 
         public void StateUpdate () {
-            if (_currentState != null) {
-                _currentState.StateUpdate ();
-                if (_currentState.isCompleted) {
-                    _currentState = _currentState.GetNextState ();
+            var current = currentState;
+            if (current != null) {
+                current.StateUpdate ();
+                if (current.isCompleted) {
+                    SetState (current.GetNextState ());
                 }
             }
         }
 
-        // public override void PopState (IState state) {
-        //     if (state == null) {
-        //         return;
-        //     }
-
-        //     if (!m_stateStack.Contains (state)) {
-        //         return;
-        //     }
-
-        //     IState popedItem;
-        //     do {
-        //         popedItem = m_stateStack.Pop ();
-        //         m_endingStates.Enqueue (popedItem);
-        //     } while (popedItem != state);
-        //     m_currentState = m_stateStack.Peek ();
-        // }
-
-        // public override void PushState (IState state) {
-        //     if (state == null) {
-        //         return;
-        //     }
-        //     state.SetProperty (this, m_stateStack.Count);
-        //     m_currentState = state;
-        //     m_stateStack.Push (state);
-        // }
+        public void PushState (IState state) {
+            if (state == null) {
+                return;
+            }
+            state.controller = this;
+            stateStack.Push (state);
+        }
     }
 }

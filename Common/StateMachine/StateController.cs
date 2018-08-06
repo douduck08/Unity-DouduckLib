@@ -17,14 +17,18 @@ namespace DouduckLib {
         }
 
         public void SetState (IState state) {
-            _currentState = state;
+            if (state != null) {
+                state.controller = this;
+                _currentState = state;
+            }
         }
 
         public void StateUpdate () {
-            if (_currentState != null) {
-                _currentState.StateUpdate ();
-                if (_currentState.isCompleted) {
-                    _currentState = _currentState.GetNextState ();
+            var current = currentState;
+            if (current != null) {
+                current.StateUpdate ();
+                if (current.isCompleted) {
+                    SetState (current.GetNextState ());
                 }
             }
         }
