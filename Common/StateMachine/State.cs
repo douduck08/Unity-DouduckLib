@@ -42,6 +42,10 @@ namespace DouduckLib {
             }
         }
 
+        protected void Complete () {
+            _isCompleted = true;
+        }
+
         public abstract IState GetNextState ();
 
         public virtual void OnStateEnter () { }

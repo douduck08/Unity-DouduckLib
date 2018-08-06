@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace DouduckLib {
@@ -24,7 +23,7 @@ namespace DouduckLib {
         }
 
         public void SetState (IState state) {
-            if (stateStack.Peek () != null) {
+            if (stateStack.Count > 0) {
                 stateStack.Pop ();
             }
             if (state != null) {
