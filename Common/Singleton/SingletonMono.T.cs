@@ -25,7 +25,7 @@ namespace DouduckLib {
                         }
 
                         if (_instance == null) {
-                            var go = new GameObject (typeof (T).Name);
+                            var go = new GameObject ("[Singleton]" + typeof (T).Name);
                             var component = go.AddComponent<T> ();
                             InitializeSingletonMono (component);
                         }
@@ -44,7 +44,6 @@ namespace DouduckLib {
             }
             _instance = component;
             _gameObject = component.gameObject;
-            _gameObject.name = "[Singleton]" + _gameObject.name;
             DontDestroyOnLoad (_gameObject);
         }
 
