@@ -130,7 +130,7 @@ namespace DouduckLib {
         }
 
         protected virtual void OnDespawned (TObject item) {
-            item.gameObject.SetActive (true);
+            item.gameObject.SetActive (false);
         }
     }
 }
