@@ -1,0 +1,8 @@
+{
+    "name": "com.douduck08.douduck-lib.Runtime",
+    "references": [],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true
+}

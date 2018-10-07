@@ -1,0 +1,12 @@
+{
+    "name": "com.douduck08.douduck-lib.Editor",
+    "references": [
+        "com.douduck08.douduck-lib.Runtime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true
+}
