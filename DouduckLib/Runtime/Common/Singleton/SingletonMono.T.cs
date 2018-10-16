@@ -35,7 +35,7 @@ namespace DouduckLib {
             }
         }
 
-        protected static void InitializeSingletonMono (T component) {
+        protected static void InitializeSingletonMono (T component, bool dontDestroyOnLoad = true) {
             if (_instance != null) {
                 if (_instance != component)
                     throw new InvalidOperationException ("[Singleton] There should never be more than 1 singleton!");
@@ -44,7 +44,7 @@ namespace DouduckLib {
             }
             _instance = component;
             _gameObject = component.gameObject;
-            DontDestroyOnLoad (_gameObject);
+            if (dontDestroyOnLoad) DontDestroyOnLoad (_gameObject);
         }
 
         private static bool applicationIsQuitting = false;
