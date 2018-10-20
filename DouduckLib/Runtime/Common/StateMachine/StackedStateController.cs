@@ -10,7 +10,10 @@ namespace DouduckLib {
         Stack<IState> stateStack;
         public IState currentState {
             get {
-                return stateStack.Peek ();
+                if (stateStack.Count > 0)
+                    return stateStack.Peek ();
+                else
+                    return null;
             }
         }
 
