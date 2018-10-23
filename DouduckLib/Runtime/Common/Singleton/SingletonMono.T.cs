@@ -48,7 +48,12 @@ namespace DouduckLib {
         }
 
         private static bool applicationIsQuitting = false;
-        public void OnDestroy () {
+        protected virtual void Awake () {
+            applicationIsQuitting = false;
+        }
+
+        protected void OnDestroy () {
+            _instance = null;
             applicationIsQuitting = true;
         }
     }
