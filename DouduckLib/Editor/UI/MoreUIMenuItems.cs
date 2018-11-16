@@ -5,7 +5,7 @@ using DouduckLib.UI;
 
 namespace DouduckLibEditor.UI {
     public class MoreUIMenuItems {
-        [MenuItem ("GameObject/UI/Empty UI")]
+        [MenuItem ("GameObject/UI/Others/Empty UI")]
         static void CreateEmptyUI (MenuCommand command) {
             var go = new GameObject ("EmptyUI");
             go.AddComponent<EmptyUI> ();
@@ -14,7 +14,7 @@ namespace DouduckLibEditor.UI {
             Selection.activeObject = go;
         }
 
-        [MenuItem ("GameObject/UI/Non-Raycast/Image", false)]
+        [MenuItem ("GameObject/UI/Others/Non-Raycast Image", false)]
         static void CreatImage (MenuCommand menuCommand) {
             EditorApplication.ExecuteMenuItem ("GameObject/UI/Image");
             GameObject go = Selection.activeGameObject;
@@ -22,7 +22,7 @@ namespace DouduckLibEditor.UI {
             go.GetComponent<Image> ().raycastTarget = false;
         }
 
-        [MenuItem ("GameObject/UI/Non-Raycast/Text", false)]
+        [MenuItem ("GameObject/UI/Others/Non-Raycast Text", false)]
         static void CreatText (MenuCommand menuCommand) {
             EditorApplication.ExecuteMenuItem ("GameObject/UI/Text");
             GameObject go = Selection.activeGameObject;

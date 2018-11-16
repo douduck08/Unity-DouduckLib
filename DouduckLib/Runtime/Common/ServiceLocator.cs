@@ -5,6 +5,18 @@ using UnityEngine;
 using DouduckLib;
 
 namespace DouduckLib {
+    public interface IUpdatable {
+        void OnUpdate ();
+    }
+
+    public interface IFixedUpdatable {
+        void OnFixedUpdate ();
+    }
+
+    public interface ILateUpdatable {
+        void OnLateUpdate ();
+    }
+
     public sealed class ServiceLocator : SingletonMono<ServiceLocator> {
 
         private Dictionary<Type, object> _serviceDictionary = new Dictionary<Type, object> ();
