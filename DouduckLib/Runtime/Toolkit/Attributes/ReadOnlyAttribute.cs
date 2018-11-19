@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace DouduckLib {
+    [AttributeUsage (AttributeTargets.Field)]
     public class ReadOnlyAttribute : PropertyAttribute { }
 
 #if UNITY_EDITOR
