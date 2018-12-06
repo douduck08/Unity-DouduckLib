@@ -18,7 +18,7 @@ namespace DouduckLib {
 
         public override void OnGUI (Rect position, SerializedProperty property, GUIContent label) {
             if (property.propertyType != SerializedPropertyType.Integer) {
-                EditorGUI.LabelField (position, label.text, "Use [LayerAttribute] with int.");
+                EditorGUI.HelpBox (position, string.Format ("[LayerAttribute] The field '{0}' must be int.", label.text), MessageType.Error);
             } else {
                 property.intValue = EditorGUI.LayerField (position, label.text, property.intValue);
             }

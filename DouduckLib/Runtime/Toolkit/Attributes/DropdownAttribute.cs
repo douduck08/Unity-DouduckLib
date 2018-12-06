@@ -82,7 +82,7 @@ namespace DouduckLib {
                     property.stringValue = dropdown.stringValues[index];
                 }
             } else {
-                EditorGUI.LabelField (position, label.text, "Use [DropdownAttribute] with the type of 'values'.");
+                EditorGUI.HelpBox (position, string.Format ("[DropdownAttribute] The field '{0}' must match 'values'.", label.text), MessageType.Error);
             }
         }
     }
