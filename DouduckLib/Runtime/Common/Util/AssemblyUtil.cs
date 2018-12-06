@@ -37,14 +37,11 @@ namespace DouduckLib {
 
             travledObjects.Add (instance);
 
-            // var type = typeof (T);
-            // var enumerableType = typeof (IEnumerable<T>);
-            var instanceType = instance.GetType ();
-            var fields = instanceType.GetFields (BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            var fields = instance.GetType ().GetFields (BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
             foreach (var field in fields) {
                 if (typeof (IEnumerable<T>).IsAssignableFrom (field.FieldType)) {
-                    var collection = field.GetValue (instance) as IList<T>;
+                    var collection = field.GetValue (instance) as IEnumerable<T>;
                     int index = 0;
                     foreach (var item in collection) {
                         task.Invoke (string.Format ("{0}/{1}[{2}]", pathName, field.Name, index), item);
@@ -53,15 +50,16 @@ namespace DouduckLib {
                 } else if (typeof (T).IsAssignableFrom (field.FieldType)) {
                     var item = (T) field.GetValue (instance);
                     task.Invoke (string.Format ("{0}/{1}", pathName, field.Name), item);
-                } else if (includeNested) {
-                    var isEnumerable = field.FieldType.GetInterfaces ().Any (x => x.IsGenericType && x.GetGenericTypeDefinition () == typeof (IEnumerable<>));
-                    var isCollection = field.FieldType.GetInterfaces ().Any (x => x.IsGenericType && x.GetGenericTypeDefinition () == typeof (ICollection<>));
-                    if (isEnumerable && isCollection) {
-                        var fieldObject = field.GetValue (instance);
-                        var count = (int) field.FieldType.GetProperty ("Count").GetValue (fieldObject, null);
-                        for (int index = 0; index < count; index++) {
-                            var item = field.FieldType.GetProperty ("Item").GetValue (fieldObject, new Object[] { index });
+                }
+
+                if (includeNested && field.FieldType.IsClass) {
+                    var isEnumerable = typeof (IEnumerable).IsAssignableFrom (field.FieldType);
+                    if (isEnumerable) {
+                        var collection = field.GetValue (instance) as IEnumerable;
+                        int index = 0;
+                        foreach (var item in collection) {
                             RunTaskForAllFields_Internal (item, travledObjects, task, string.Format ("{0}/{1}[{2}]", pathName, field.Name, index), includeNested, depthLimit - 1);
+                            index++;
                         }
                     } else {
                         RunTaskForAllFields_Internal (field.GetValue (instance), travledObjects, task, string.Format ("{0}/{1}", pathName, field.Name), includeNested, depthLimit - 1);
