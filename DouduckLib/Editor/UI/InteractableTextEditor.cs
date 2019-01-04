@@ -10,15 +10,6 @@ namespace DouduckLibEditor.UI {
     [CanEditMultipleObjects, CustomEditor (typeof (InteractableText), true)]
     public class InteractableTextEditor : GraphicEditor {
 
-        [MenuItem ("GameObject/UI/Interactable Text")]
-        static void Create (MenuCommand command) {
-            var go = new GameObject ("InteractableText");
-            go.AddComponent<InteractableText> ();
-            GameObjectUtility.SetParentAndAlign (go, command.context as GameObject);
-            Undo.RegisterCreatedObjectUndo (go, "Create" + go.name);
-            Selection.activeObject = go;
-        }
-
         GUIContent m_textContent;
         SerializedProperty m_nonParsedStr;
         SerializedProperty m_fontData;

@@ -7,8 +7,6 @@ using UnityEditor;
 namespace DouduckLibEditor {
     public class EditorUtil {
         public const string MenuItemPathRoot = "Tools/DouduckLib/";
-        public const int TotalToolBox = 0;
-        public const int EditorWindows = 20;
 
         public static void SaveAsPNG (Texture2D texture, string defaultName) {
             if (texture == null) {

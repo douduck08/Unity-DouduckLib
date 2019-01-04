@@ -19,7 +19,7 @@ namespace DouduckLibEditor {
         SerializedProperty generatorProperty;
         // SerializedProperty textureProperty;
 
-        [MenuItem (EditorUtil.MenuItemPathRoot + "Noise Generator", false, EditorUtil.EditorWindows)]
+        [MenuItem (EditorUtil.MenuItemPathRoot + "Noise Generator", false, 20)]
         public static void ShowWindow () {
             EditorWindow.GetWindow (typeof (NoiseGeneratorEditorWindow), false, "Noise Generator");
         }
