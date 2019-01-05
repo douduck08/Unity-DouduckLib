@@ -13,6 +13,8 @@ namespace DouduckLibEditor {
         protected Object target;
         protected SerializedObject serializedObject;
 
+        Vector2 scrollPos;
+
         void Initialize () {
             if (target == null) {
                 target = this;
@@ -24,5 +26,30 @@ namespace DouduckLibEditor {
             Initialize ();
         }
 
+        protected void OnLostFocus () { }
+
+        protected abstract void OnDrawGUIBody ();
+
+        protected void OnGUI () {
+            using (new EditorGUILayout.HorizontalScope ()) {
+                EditorGUIWrapper.DrawHeader (titleContent.text);
+
+                // TODO: menu item
+                // var gearStyle = new GUIStyle ("Icon.Options");
+                // if (GUILayout.Button (gearStyle.normal.background, new GUIStyle ("IconButton"), GUILayout.MaxWidth (20))) {
+                //     var menu = new GenericMenu ();
+                //     menu.AddItem (new GUIContent ("Close"), false, data => {
+                //         var item = data as EditorWindow;
+                //         item.Close ();
+                //     }, this);
+                //     menu.ShowAsContext ();
+                // }
+            }
+
+            using (var scrollView = new EditorGUILayout.ScrollViewScope (scrollPos)) {
+                scrollPos = scrollView.scrollPosition;
+                OnDrawGUIBody ();
+            }
+        }
     }
 }

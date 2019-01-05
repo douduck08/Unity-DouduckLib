@@ -11,8 +11,31 @@ namespace DouduckLibEditor {
             Open ("Noise Generator");
         }
 
-        void OnGUI () {
-            GUILayout.Label (title);
+        bool fold;
+
+        protected override void OnDrawGUIBody () {
+            EditorGUIWrapper.DrawSection ("Section", () => {
+                using (new EditorGUILayout.HorizontalScope ()) {
+                    EditorGUIWrapper.DrawTexturePreview (Texture2D.whiteTexture, new Vector2 (100, 100));
+                    EditorGUIWrapper.DrawTexturePreview (Texture2D.whiteTexture, new Vector2 (100, 100));
+                    EditorGUIWrapper.DrawTexturePreview (Texture2D.whiteTexture, new Vector2 (100, 100));
+                }
+                if (GUILayout.Button ("Button", EditorGUIStyle.Button)) {
+
+                }
+            });
+
+            EditorGUIWrapper.DrawBox (() => {
+
+                if (GUILayout.Button ("Button", EditorGUIStyle.Button)) {
+
+                }
+
+                if (GUILayout.Button ("Button", EditorGUIStyle.Button)) {
+
+                }
+            });
         }
+
     }
 }
