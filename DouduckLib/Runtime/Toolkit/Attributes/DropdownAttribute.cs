@@ -9,7 +9,13 @@ namespace DouduckLib {
     [AttributeUsage (AttributeTargets.Field)]
     public sealed class DropdownAttribute : PropertyAttribute {
 
-        public SerializedPropertyType propertyType;
+        public enum ValueType {
+            Integer,
+            Float,
+            String
+        }
+
+        public ValueType valueType;
         public string[] displayNames;
 
         public int[] intValues;
@@ -17,7 +23,7 @@ namespace DouduckLib {
         public string[] stringValues;
 
         public DropdownAttribute (int[] values, string[] displayNames) {
-            this.propertyType = SerializedPropertyType.Integer;
+            this.valueType = ValueType.Integer;
             this.displayNames = displayNames;
             this.intValues = values;
         }
@@ -30,7 +36,7 @@ namespace DouduckLib {
         }
 
         public DropdownAttribute (float[] values, string[] displayNames) {
-            this.propertyType = SerializedPropertyType.Float;
+            this.valueType = ValueType.Float;
             this.displayNames = displayNames;
             this.floatValues = values;
         }
@@ -43,7 +49,7 @@ namespace DouduckLib {
         }
 
         public DropdownAttribute (string[] values, string[] displayNames) {
-            this.propertyType = SerializedPropertyType.String;
+            this.valueType = ValueType.String;
             this.displayNames = displayNames;
             this.stringValues = values;
         }
@@ -67,16 +73,16 @@ namespace DouduckLib {
 
             DropdownAttribute dropdown = attribute as DropdownAttribute;
 
-            if (dropdown.propertyType == property.propertyType) {
-                if (dropdown.propertyType == SerializedPropertyType.Integer) {
+            if (dropdown.valueType.ToString () == property.propertyType.ToString ()) {
+                if (dropdown.valueType == DropdownAttribute.ValueType.Integer) {
                     int index = dropdown.GetIndex (property.intValue);
                     index = EditorGUI.Popup (position, label.text, index, dropdown.displayNames);
                     property.intValue = dropdown.intValues[index];
-                } else if (dropdown.propertyType == SerializedPropertyType.Float) {
+                } else if (dropdown.valueType == DropdownAttribute.ValueType.Float) {
                     int index = dropdown.GetIndex (property.floatValue);
                     index = EditorGUI.Popup (position, label.text, index, dropdown.displayNames);
                     property.floatValue = dropdown.floatValues[index];
-                } else if (dropdown.propertyType == SerializedPropertyType.String) {
+                } else if (dropdown.valueType == DropdownAttribute.ValueType.String) {
                     int index = dropdown.GetIndex (property.stringValue);
                     index = EditorGUI.Popup (position, label.text, index, dropdown.displayNames);
                     property.stringValue = dropdown.stringValues[index];
