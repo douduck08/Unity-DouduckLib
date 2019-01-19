@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEditor;
 
@@ -25,29 +26,21 @@ public static class EditorGUIWrapper {
     public static void DrawSection (string title, Action onGUI) {
         using (new EditorGUILayout.VerticalScope (EditorGUIStyle.Box)) {
             GUILayout.Label (title, EditorGUIStyle.Section);
-
             // GUILayout.FlexibleSpace ();
             if (onGUI != null) onGUI.Invoke ();
             // GUILayout.FlexibleSpace ();
         }
     }
 
-    // TODO: Foldout Section
-    // public static bool DrawFoldoutSection (bool fold, string title, Action onGUI) {
-    //     using (new EditorGUILayout.VerticalScope (EditorGUIStyle.Box)) {
-    //         using (new EditorGUILayout.HorizontalScope ()) {
-    //             var foldStyle = new GUIStyle ("Foldout");
-    //             foldStyle.fixedWidth = 1;
-    //             fold = EditorGUILayout.Foldout (fold, "", foldStyle);
-    //             GUILayout.Label (title, EditorGUIStyle.Section);
-    //         }
-
-    //         // GUILayout.FlexibleSpace ();
-    //         if (fold && onGUI != null) onGUI.Invoke ();
-    //         // GUILayout.FlexibleSpace ();
-    //     }
-    //     return fold;
-    // }
+    public static bool DrawFoldout (bool fold, string title, Action onGUI) {
+        using (new EditorGUILayout.VerticalScope (EditorGUIStyle.Box)) {
+            fold = EditorGUILayout.Foldout (fold, title, EditorGUIStyle.Flodout);
+            // GUILayout.FlexibleSpace ();
+            if (fold && onGUI != null) onGUI.Invoke ();
+            // GUILayout.FlexibleSpace ();
+        }
+        return fold;
+    }
 
     public static void DrawTexturePreview (Texture2D texture, Vector2 previewSize) {
         using (new EditorGUILayout.HorizontalScope ()) {
@@ -61,5 +54,19 @@ public static class EditorGUIWrapper {
 
             GUILayout.FlexibleSpace ();
         }
+    }
+
+    static MethodInfo methodInfo;
+    public static Gradient DrawGradientField (string label, Gradient gradient, params GUILayoutOption[] options) {
+        if (methodInfo == null) {
+            methodInfo = typeof (EditorGUILayout).GetMethod ("GradientField", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static, null, new [] { typeof (string), typeof (Gradient), typeof (GUILayoutOption[]) }, null);
+        }
+
+        if (gradient == null) {
+            gradient = new Gradient ();
+        }
+
+        gradient = (Gradient) methodInfo.Invoke (null, new object[] { label, gradient, options });
+        return gradient;
     }
 }

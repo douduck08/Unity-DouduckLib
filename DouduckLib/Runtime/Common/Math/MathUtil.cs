@@ -10,6 +10,7 @@ namespace DouduckLib {
         public static readonly float thirdPi = Mathf.PI / 3.0f;
         public static readonly float radToDeg = 180.0f / Mathf.PI;
         public static readonly float degToRad = Mathf.PI / 180.0f;
+        public static readonly float sqrt2 = Mathf.Sqrt (2f);
 
         public float GetDirection (Vector2 vector) {
             if (vector.y >= 0) {

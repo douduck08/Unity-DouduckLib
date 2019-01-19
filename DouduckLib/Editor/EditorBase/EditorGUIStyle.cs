@@ -13,6 +13,7 @@ public static class EditorGUIStyle {
                 header.margin = new RectOffset (4, 4, 4, 4);
                 header.padding = new RectOffset (8, 8, 8, 8);
                 header.fixedHeight = 0;
+
                 header.fontSize = 14;
                 header.alignment = TextAnchor.MiddleCenter;
             }
@@ -24,11 +25,12 @@ public static class EditorGUIStyle {
     public static GUIStyle Box {
         get {
             if (box == null) {
-                box = new GUIStyle (GUI.skin.GetStyle ("Box"));
-                box.normal.background = GetBorderedTexture (new Color (0.26f, 0.26f, 0.26f), new Color (0.15f, 0.15f, 0.15f));
-                box.border = new RectOffset (1, 1, 1, 1);
+                box = new GUIStyle (GUI.skin.GetStyle ("OL Box"));
+                box.margin = new RectOffset (4, 4, 0, 4);
                 box.padding = new RectOffset (5, 5, 5, 5);
-                box.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
+                box.stretchHeight = false;
+                box.stretchWidth = true;
+                // box.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
                 box.fontSize = 10;
                 box.alignment = TextAnchor.MiddleCenter;
             }
@@ -40,14 +42,34 @@ public static class EditorGUIStyle {
     public static GUIStyle Section {
         get {
             if (section == null) {
-                section = new GUIStyle (GUI.skin.GetStyle ("sv_iconselector_back"));
+                section = new GUIStyle (GUI.skin.GetStyle ("OL Box"));
                 section.padding = new RectOffset (4, 4, 4, 4);
                 section.margin = new RectOffset (4, 4, 4, 4);
                 section.stretchHeight = false;
                 section.stretchWidth = true;
-                section.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
+                // section.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
             }
             return section;
+        }
+    }
+
+    static GUIStyle flodout;
+    public static GUIStyle Flodout {
+        get {
+            if (flodout == null) {
+                flodout = new GUIStyle (EditorStyles.foldout);
+                flodout.padding = new RectOffset (18, 4, 0, 4);
+                flodout.margin = new RectOffset (4, 4, 4, 4);
+                flodout.stretchHeight = false;
+                flodout.stretchWidth = true;
+
+                // flodout.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
+                flodout.active.textColor = flodout.normal.textColor;
+                flodout.onActive.textColor = flodout.normal.textColor;
+                flodout.focused.textColor = flodout.normal.textColor;
+                flodout.onFocused.textColor = flodout.normal.textColor;
+            }
+            return flodout;
         }
     }
 
@@ -61,7 +83,7 @@ public static class EditorGUIStyle {
                 button.margin = new RectOffset (5, 5, 5, 5);
                 button.contentOffset = Vector2.zero;
                 button.fontSize = 12;
-                button.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
+                // button.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
                 button.alignment = TextAnchor.MiddleCenter;
             }
             return button;

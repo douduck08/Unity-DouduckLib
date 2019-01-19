@@ -2,40 +2,60 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using DouduckLib;
 
 namespace DouduckLibEditor {
     public class NoiseGeneratorWindow : EditorWindowBase<NoiseGeneratorWindow> {
 
-        [MenuItem (EditorUtil.MenuItemPathRoot + "Test Noise Generator", false, 20)]
+        [MenuItem (EditorUtil.MenuItemPathRoot + "Noise Texture Generator", false, 20)]
         public static void OpenWindow () {
-            Open ("Noise Generator");
+            Open ("Noise Texture Generator");
         }
 
-        bool fold;
+        NoiseType noiseType = NoiseType.Perlin;
+        Gradient coloring = new Gradient () {
+            colorKeys = new GradientColorKey[] { new GradientColorKey (Color.black, 0), new GradientColorKey (Color.white, 1) }
+        };
+        float scale = 16f;
+        int octaves = 1;
+        float persistence = 0.5f;
+        float lacunarity = 2f;
+
+        int resolution = 512;
+        Texture2D preview;
 
         protected override void OnDrawGUIBody () {
-            EditorGUIWrapper.DrawSection ("Section", () => {
-                using (new EditorGUILayout.HorizontalScope ()) {
-                    EditorGUIWrapper.DrawTexturePreview (Texture2D.whiteTexture, new Vector2 (100, 100));
-                    EditorGUIWrapper.DrawTexturePreview (Texture2D.whiteTexture, new Vector2 (100, 100));
-                    EditorGUIWrapper.DrawTexturePreview (Texture2D.whiteTexture, new Vector2 (100, 100));
-                }
-                if (GUILayout.Button ("Button", EditorGUIStyle.Button)) {
-
+            EditorGUIWrapper.DrawSection ("Noise Settings", () => {
+                noiseType = (NoiseType) EditorGUILayout.EnumPopup ("Noise Type", noiseType);
+                coloring = EditorGUIWrapper.DrawGradientField ("Coloring", coloring);
+                scale = EditorGUILayout.Slider ("Scale", scale, 1f, 100f);
+                octaves = EditorGUILayout.IntSlider ("Octaves", octaves, 1, 8);
+                persistence = EditorGUILayout.Slider ("Persistence", persistence, 0f, 1f);
+                lacunarity = EditorGUILayout.Slider ("Lacunarity", lacunarity, 1f, 4f);
+                if (GUILayout.Button ("Preview")) {
+                    preview = NoiseTexture.CreateNoiseTexture2D (256, coloring, scale, noiseType, octaves, persistence, lacunarity);
                 }
             });
 
-            EditorGUIWrapper.DrawBox (() => {
-
-                if (GUILayout.Button ("Button", EditorGUIStyle.Button)) {
-
+            EditorGUIWrapper.DrawSection ("Preview", () => {
+                using (new EditorGUILayout.HorizontalScope ()) {
+                    if (preview == null) preview = Texture2D.whiteTexture;
+                    EditorGUIWrapper.DrawTexturePreview (preview, new Vector2 (256, 256));
                 }
-
-                if (GUILayout.Button ("Button", EditorGUIStyle.Button)) {
-
+            });
+            EditorGUIWrapper.DrawSection ("Export", () => {
+                resolution = EditorGUILayout.IntField ("Resolution", resolution);
+                using (new EditorGUILayout.HorizontalScope ()) {
+                    if (GUILayout.Button ("Export PNG")) {
+                        var tmp = NoiseTexture.CreateNoiseTexture2D (resolution, coloring, scale, noiseType, octaves, persistence, lacunarity);
+                        EditorUtil.SaveAsPNG (tmp, "new noise texture");
+                    }
+                    if (GUILayout.Button ("Export JPG")) {
+                        var tmp = NoiseTexture.CreateNoiseTexture2D (resolution, coloring, scale, noiseType, octaves, persistence, lacunarity);
+                        EditorUtil.SaveAsJPG (tmp, "new noise texture");
+                    }
                 }
             });
         }
-
     }
 }

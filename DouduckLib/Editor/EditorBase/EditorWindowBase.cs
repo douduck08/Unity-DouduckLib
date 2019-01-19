@@ -8,6 +8,7 @@ namespace DouduckLibEditor {
 
         protected static void Open (string title) {
             T window = EditorWindow.GetWindow<T> (false, title, true);
+            window.minSize = new Vector2 (256, 256);
         }
 
         protected Object target;
