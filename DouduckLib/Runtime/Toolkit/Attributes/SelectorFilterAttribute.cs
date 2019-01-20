@@ -87,6 +87,7 @@ namespace DouduckLib {
             string commandName = Event.current.commandName;
             if (commandName == "ObjectSelectorUpdated" && SelectorFilterAttribute.currentActiveFieldName == property.name) {
                 property.objectReferenceValue = EditorGUIUtility.GetObjectPickerObject ();
+                SelectorFilterAttribute.currentActiveFieldName = "";
             }
         }
     }
