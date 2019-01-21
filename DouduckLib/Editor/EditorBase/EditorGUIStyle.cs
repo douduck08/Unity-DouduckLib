@@ -30,7 +30,8 @@ public static class EditorGUIStyle {
                 box.padding = new RectOffset (5, 5, 5, 5);
                 box.stretchHeight = false;
                 box.stretchWidth = true;
-                // box.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
+
+                if (EditorGUIUtility.isProSkin) box.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
                 box.fontSize = 10;
                 box.alignment = TextAnchor.MiddleCenter;
             }
@@ -47,7 +48,8 @@ public static class EditorGUIStyle {
                 section.margin = new RectOffset (4, 4, 4, 4);
                 section.stretchHeight = false;
                 section.stretchWidth = true;
-                // section.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
+
+                if (EditorGUIUtility.isProSkin) section.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
             }
             return section;
         }
@@ -63,7 +65,7 @@ public static class EditorGUIStyle {
                 flodout.stretchHeight = false;
                 flodout.stretchWidth = true;
 
-                // flodout.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
+                if (EditorGUIUtility.isProSkin) flodout.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
                 flodout.active.textColor = flodout.normal.textColor;
                 flodout.onActive.textColor = flodout.normal.textColor;
                 flodout.focused.textColor = flodout.normal.textColor;
@@ -83,7 +85,6 @@ public static class EditorGUIStyle {
                 button.margin = new RectOffset (5, 5, 5, 5);
                 button.contentOffset = Vector2.zero;
                 button.fontSize = 12;
-                // button.normal.textColor = new Color (0.7f, 0.7f, 0.7f, 1);
                 button.alignment = TextAnchor.MiddleCenter;
             }
             return button;

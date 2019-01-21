@@ -26,7 +26,7 @@ namespace DouduckLib {
             float texelSize = 1f / resolution;
             for (int y = 0; y < resolution; y++) {
                 for (int x = 0; x < resolution; x++) {
-                    Vector3 point = new Vector3 ((x + 0.5f) * texelSize, (y + 0.5f) * texelSize, 0f);
+                    var point = new Vector2 ((x + 0.5f) * texelSize, (y + 0.5f) * texelSize);
                     float noise = 0f;
                     if (noiseType == NoiseType.Value) {
                         noise = Octaves (Noise.Value2D, point, scale, octaves, lacunarity, persistence);

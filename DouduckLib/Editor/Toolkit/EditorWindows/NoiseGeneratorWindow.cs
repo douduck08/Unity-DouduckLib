@@ -48,11 +48,11 @@ namespace DouduckLibEditor {
                 using (new EditorGUILayout.HorizontalScope ()) {
                     if (GUILayout.Button ("Export PNG")) {
                         var tmp = NoiseTexture.CreateNoiseTexture2D (resolution, coloring, scale, noiseType, octaves, persistence, lacunarity);
-                        EditorUtil.SaveAsPNG (tmp, "new noise texture");
+                        EditorUtil.SaveAsPNG (tmp, "noise texture");
                     }
                     if (GUILayout.Button ("Export JPG")) {
                         var tmp = NoiseTexture.CreateNoiseTexture2D (resolution, coloring, scale, noiseType, octaves, persistence, lacunarity);
-                        EditorUtil.SaveAsJPG (tmp, "new noise texture");
+                        EditorUtil.SaveAsJPG (tmp, "noise texture");
                     }
                 }
             });
