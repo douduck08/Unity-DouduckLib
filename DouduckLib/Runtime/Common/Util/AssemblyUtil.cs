@@ -28,17 +28,18 @@ namespace DouduckLib {
         }
 
         public static void RunTaskForAllFields<T> (Object instance, Action<string, T> task, string rootName = "unknown", bool includeNested = true, int depthLimit = 10) {
+            // TODO: need rewrite
             RunTaskForAllFields_Internal (instance, new HashSet<Object> (), task, rootName, includeNested, depthLimit);
         }
 
         static void RunTaskForAllFields_Internal<T> (Object instance, HashSet<Object> travledObjects, Action<string, T> task, string pathName, bool includeNested, int depthLimit) {
+            if (instance == null) return;
             if (depthLimit < 1) return;
             if (travledObjects.Contains (instance)) return;
 
             travledObjects.Add (instance);
 
             var fields = instance.GetType ().GetFields (BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-
             foreach (var field in fields) {
                 if (typeof (IEnumerable<T>).IsAssignableFrom (field.FieldType)) {
                     var collection = field.GetValue (instance) as IEnumerable<T>;
@@ -53,9 +54,9 @@ namespace DouduckLib {
                 }
 
                 if (includeNested && field.FieldType.IsClass) {
-                    var isEnumerable = typeof (IEnumerable).IsAssignableFrom (field.FieldType);
+                    var isEnumerable = typeof (IEnumerable<T>).IsAssignableFrom (field.FieldType);
                     if (isEnumerable) {
-                        var collection = field.GetValue (instance) as IEnumerable;
+                        var collection = field.GetValue (instance) as IEnumerable<T>;
                         int index = 0;
                         foreach (var item in collection) {
                             RunTaskForAllFields_Internal (item, travledObjects, task, string.Format ("{0}/{1}[{2}]", pathName, field.Name, index), includeNested, depthLimit - 1);
