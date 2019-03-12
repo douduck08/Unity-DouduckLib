@@ -27,48 +27,38 @@ namespace DouduckLib {
             return m_AssemblyTypes;
         }
 
-        public static void RunTaskForAllFields<T> (Object instance, Action<string, T> task, string rootName = "unknown", bool includeNested = true, int depthLimit = 10) {
-            // TODO: need rewrite
-            RunTaskForAllFields_Internal (instance, new HashSet<Object> (), task, rootName, includeNested, depthLimit);
+        public static void FindAllInstances<T> (Object root, Action<string, T> callback, string path = "root", int depthLimit = 10) where T : class {
+            FindAllInstances_Internal (root, new HashSet<Object> (), callback, path, depthLimit);
         }
 
-        static void RunTaskForAllFields_Internal<T> (Object instance, HashSet<Object> travledObjects, Action<string, T> task, string pathName, bool includeNested, int depthLimit) {
+        static void FindAllInstances_Internal<T> (Object instance, HashSet<Object> travledObjects, Action<string, T> callback, string path, int depthLimit) where T : class {
             if (instance == null) return;
             if (depthLimit < 1) return;
             if (travledObjects.Contains (instance)) return;
 
             travledObjects.Add (instance);
 
-            var fields = instance.GetType ().GetFields (BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            foreach (var field in fields) {
-                if (typeof (IEnumerable<T>).IsAssignableFrom (field.FieldType)) {
-                    var collection = field.GetValue (instance) as IEnumerable<T>;
-                    int index = 0;
-                    foreach (var item in collection) {
-                        task.Invoke (string.Format ("{0}/{1}[{2}]", pathName, field.Name, index), item);
-                        index++;
-                    }
-                } else if (typeof (T).IsAssignableFrom (field.FieldType)) {
-                    var item = (T) field.GetValue (instance);
-                    task.Invoke (string.Format ("{0}/{1}", pathName, field.Name), item);
-                }
+            var target = instance as T;
+            if (target != null) {
+                callback.Invoke (path, target);
+            }
 
-                if (includeNested && field.FieldType.IsClass) {
-                    var isEnumerable = typeof (IEnumerable<T>).IsAssignableFrom (field.FieldType);
-                    if (isEnumerable) {
-                        var collection = field.GetValue (instance) as IEnumerable<T>;
-                        int index = 0;
-                        foreach (var item in collection) {
-                            RunTaskForAllFields_Internal (item, travledObjects, task, string.Format ("{0}/{1}[{2}]", pathName, field.Name, index), includeNested, depthLimit - 1);
-                            index++;
-                        }
-                    } else {
-                        RunTaskForAllFields_Internal (field.GetValue (instance), travledObjects, task, string.Format ("{0}/{1}", pathName, field.Name), includeNested, depthLimit - 1);
-                    }
+            var collection = instance as IEnumerable;
+            if (collection != null) {
+                int index = 0;
+                foreach (var item in collection) {
+                    FindAllInstances_Internal (item, travledObjects, callback, string.Format ("{0}[{1}]", path, index), depthLimit - 1);
+                    index++;
+                }
+            } else {
+                var instanceType = instance.GetType ();
+                var fields = instanceType.GetFields (BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                foreach (var field in fields) {
+                    FindAllInstances_Internal (field.GetValue (instance), travledObjects, callback, string.Format ("{0}/{1}", path, field.Name), depthLimit - 1);
                 }
             }
-        }
 
+        }
     }
 
     public static class AssemblyExtenstion {
