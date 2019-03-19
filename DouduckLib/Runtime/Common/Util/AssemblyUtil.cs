@@ -27,11 +27,11 @@ namespace DouduckLib {
             return m_AssemblyTypes;
         }
 
-        public static void FindAllInstances<T> (Object root, Action<string, T> callback, string path = "root", int depthLimit = 10) where T : class {
-            FindAllInstances_Internal (root, new HashSet<Object> (), callback, path, depthLimit);
+        public static void FindAllInstances<T> (Object root, Action<T, string> callback, Func<Object, string, bool> validate = null, string path = "root", int depthLimit = 10) where T : class {
+            FindAllInstances_Internal (root, new HashSet<Object> (), callback, validate, path, depthLimit);
         }
 
-        static void FindAllInstances_Internal<T> (Object instance, HashSet<Object> travledObjects, Action<string, T> callback, string path, int depthLimit) where T : class {
+        static void FindAllInstances_Internal<T> (Object instance, HashSet<Object> travledObjects, Action<T, string> callback, Func<Object, string, bool> validate, string path, int depthLimit) where T : class {
             if (instance == null) return;
             if (depthLimit < 1) return;
             if (travledObjects.Contains (instance)) return;
@@ -40,21 +40,25 @@ namespace DouduckLib {
 
             var target = instance as T;
             if (target != null) {
-                callback.Invoke (path, target);
+                callback.Invoke (target, path);
+            }
+
+            if (validate != null && !validate.Invoke (instance, path)) {
+                return;
             }
 
             var collection = instance as IEnumerable;
             if (collection != null) {
                 int index = 0;
                 foreach (var item in collection) {
-                    FindAllInstances_Internal (item, travledObjects, callback, string.Format ("{0}[{1}]", path, index), depthLimit - 1);
+                    FindAllInstances_Internal (item, travledObjects, callback, validate, string.Format ("{0}[{1}]", path, index), depthLimit - 1);
                     index++;
                 }
             } else {
                 var instanceType = instance.GetType ();
                 var fields = instanceType.GetFields (BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
                 foreach (var field in fields) {
-                    FindAllInstances_Internal (field.GetValue (instance), travledObjects, callback, string.Format ("{0}/{1}", path, field.Name), depthLimit - 1);
+                    FindAllInstances_Internal (field.GetValue (instance), travledObjects, callback, validate, string.Format ("{0}/{1}", path, field.Name), depthLimit - 1);
                 }
             }
 
