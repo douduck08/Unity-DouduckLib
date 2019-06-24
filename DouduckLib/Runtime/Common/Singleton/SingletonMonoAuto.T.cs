@@ -43,5 +43,9 @@ namespace DouduckLib {
             }
             OnSingletonDestroy ();
         }
+
+        protected void OnApplicationQuit () {
+            _applicationIsQuitting = true;
+        }
     }
 }
