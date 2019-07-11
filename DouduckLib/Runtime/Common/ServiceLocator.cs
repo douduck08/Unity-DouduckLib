@@ -17,7 +17,7 @@ namespace DouduckLib {
         void OnLateUpdate ();
     }
 
-    public sealed class ServiceLocator : SingletonMono<ServiceLocator> {
+    public sealed class ServiceLocator : SingletonMonoAuto<ServiceLocator> {
 
         private Dictionary<Type, object> _serviceDictionary = new Dictionary<Type, object> ();
         private List<IUpdatable> _updatableList = new List<IUpdatable> ();

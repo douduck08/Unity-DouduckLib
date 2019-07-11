@@ -20,20 +20,22 @@ namespace DouduckLib {
             return (T) Resolve (typeof (T));
         }
 
-        public object Resolve (Type contract) {
-            if (typeInstances.ContainsKey (contract)) {
-                return typeInstances[contract];
+        public object Resolve (Type contractType) {
+            if (typeInstances.ContainsKey (contractType)) {
+                return typeInstances[contractType];
             } else {
-                Type implementation = types[contract];
+                Type implementation = types[contractType];
                 ConstructorInfo constructor = implementation.GetConstructors () [0];
                 ParameterInfo[] constructorParameters = constructor.GetParameters ();
                 if (constructorParameters.Length == 0) {
                     return Activator.CreateInstance (implementation);
                 }
+
                 List<object> parameters = new List<object> (constructorParameters.Length);
                 foreach (ParameterInfo parameterInfo in constructorParameters) {
                     parameters.Add (Resolve (parameterInfo.ParameterType));
                 }
+
                 return constructor.Invoke (parameters.ToArray ());
             }
         }
