@@ -52,7 +52,7 @@ namespace DouduckLib {
         /// <summary>
         /// This method include inactive GameObject, exclude DontDestory GameObject
         /// </summary>
-        public static IEnumerable<T> GetAllComponents<T> () where T : MonoBehaviour {
+        public static IEnumerable<T> GetAllComponents<T> () where T : Behaviour {
             foreach (Transform trans in AllTransforms) {
                 foreach (T t in trans.GetComponents<T> ()) {
                     yield return t;
