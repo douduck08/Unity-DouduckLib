@@ -13,7 +13,7 @@ namespace DouduckLib {
         static string[] OnWillSaveAssets (string[] paths) {
             foreach (string path in paths) {
                 if (Path.GetExtension (path).Equals (".unity")) {
-                    foreach (Transform trans in UnityUtil.AllTransforms) {
+                    foreach (Transform trans in UnityUtil.GetAllTransforms ()) {
                         OnSceneSaveProcessing (trans);
                     }
                     return paths;

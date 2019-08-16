@@ -7,42 +7,47 @@ using UnityEngine.SceneManagement;
 namespace DouduckLib {
     public static class UnityUtil {
 
-        public static IEnumerable<Scene> AllScenes {
+        public static Scene ActiveScene {
             get {
-                for (int i = 0; i < SceneManager.sceneCount; i++) {
-                    yield return SceneManager.GetSceneAt (i);
+                return SceneManager.GetActiveScene ();
+            }
+        }
+
+        public static IEnumerable<Scene> GetAllLoadedScenes () {
+            for (int i = 0; i < SceneManager.sceneCount; i++) {
+                yield return SceneManager.GetSceneAt (i);
+            }
+        }
+
+        /// <summary>
+        /// This method include inactive GameObject, exclude DontDestory GameObject
+        /// </summary>
+        public static IEnumerable<GameObject> GetRootGameObjects (Scene scene) {
+            return scene.GetRootGameObjects ();
+        }
+
+        /// <summary>
+        /// This method include inactive GameObject, exclude DontDestory GameObject
+        /// </summary>
+        public static IEnumerable<GameObject> GetRootGameObjects () {
+            foreach (Scene scene in GetAllLoadedScenes ()) {
+                foreach (GameObject go in GetRootGameObjects (scene)) {
+                    yield return go;
                 }
             }
         }
 
-        public static IEnumerable<Scene> AllLoadedScenes {
-            get {
-                return AllScenes.Where (scene => scene.isLoaded);
-            }
-        }
-
         /// <summary>
-        /// This property include inactive GameObject, exclude DontDestory GameObject
+        /// This method include inactive GameObject, exclude DontDestory GameObject
         /// </summary>
-        public static IEnumerable<GameObject> AllRootGameObjects {
-            get {
-                return SceneManager.GetActiveScene ().GetRootGameObjects ();
-            }
-        }
-
-        /// <summary>
-        /// This property include inactive GameObject, exclude DontDestory GameObject
-        /// </summary>
-        public static IEnumerable<Transform> AllTransforms {
-            get {
-                var rootObjects = AllRootGameObjects;
-                foreach (Transform trans in AllRootGameObjects.Select (x => x.transform)) {
-                    yield return trans;
-                    if (trans.childCount > 0) {
-                        foreach (Transform child in trans.GetComponentsInChildren<Transform> (true)) {
-                            if (child != trans) {
-                                yield return child;
-                            }
+        public static IEnumerable<Transform> GetAllTransforms () {
+            var rootObjects = GetRootGameObjects ();
+            foreach (Transform trans in rootObjects.Select (x => x.transform)) {
+                yield return trans;
+                if (trans.childCount > 0) {
+                    foreach (Transform child in trans.GetComponentsInChildren<Transform> (true)) {
+                        if (child != trans) {
+                            yield return child;
                         }
                     }
                 }
@@ -53,7 +58,7 @@ namespace DouduckLib {
         /// This method include inactive GameObject, exclude DontDestory GameObject
         /// </summary>
         public static IEnumerable<T> GetAllComponents<T> () where T : Behaviour {
-            foreach (Transform trans in AllTransforms) {
+            foreach (Transform trans in GetAllTransforms ()) {
                 foreach (T t in trans.GetComponents<T> ()) {
                     yield return t;
                 }
@@ -61,12 +66,10 @@ namespace DouduckLib {
         }
 
         /// <summary>
-        /// This property include DontDestory GameObject, exclude inactive GameObject
+        /// This method include DontDestory GameObject, exclude inactive GameObject
         /// </summary>
-        public static IEnumerable<GameObject> AllActiveGameObjects {
-            get {
-                return GameObject.FindObjectsOfType<Transform> ().Select (x => x.gameObject);
-            }
+        public static IEnumerable<GameObject> GetAllActiveGameObjects () {
+            return GameObject.FindObjectsOfType<Transform> ().Select (x => x.gameObject);
         }
     }
 }

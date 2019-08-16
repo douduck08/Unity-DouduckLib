@@ -20,6 +20,7 @@ namespace DouduckLib {
 #if UNITY_EDITOR
     [CustomPropertyDrawer (typeof (SelectorFilterAttribute))]
     public class SelectorFilterDrawer : PropertyDrawer {
+        // TODO: fix bug when multiple field in one component
         public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
             return EditorGUI.GetPropertyHeight (property, label, true) * 2f;
         }
