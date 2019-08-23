@@ -6,8 +6,9 @@ using UnityEngine;
 namespace DouduckLib {
     public class SceneRequester : MonoBehaviour {
 
+        [SerializeField, SceneAsset] string activeScene;
         [SerializeField, SceneAsset] List<string> sceneAssets;
-        bool loadOnStart;
+        [SerializeField] bool loadOnStart;
 
         void Start () {
             if (loadOnStart) {
@@ -21,7 +22,7 @@ namespace DouduckLib {
                 scenesToLoad.Remove (scene.path);
             }
             for (int i = 0; i < scenesToLoad.Count; i++) {
-                new SceneLoader (scenesToLoad[i], true).StartLoading (this);
+                new SceneLoader (scenesToLoad[i], true, scenesToLoad[i] == activeScene).StartLoading (this);
             }
         }
 

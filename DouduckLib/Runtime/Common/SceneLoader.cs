@@ -20,27 +20,32 @@ namespace DouduckLib {
         int sceneIndexToUnload = -1;
         string sceneToLoad;
         string sceneToUnload;
+        bool setActive;
 
-        public SceneLoader (int sceneToLoad, bool additive = false) {
-            this.sceneIndexToLoad = sceneToLoad;
+        public SceneLoader (int sceneToLoad, bool additive = false, bool setActive = false) {
             loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
+            this.sceneIndexToLoad = sceneToLoad;
+            this.setActive = setActive;
         }
 
-        public SceneLoader (int sceneToLoad, int sceneToUnload, bool additive = false) {
+        public SceneLoader (int sceneToLoad, int sceneToUnload, bool additive = false, bool setActive = false) {
+            loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
             this.sceneIndexToLoad = sceneToLoad;
             this.sceneIndexToUnload = sceneToUnload;
-            loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
         }
 
-        public SceneLoader (string sceneToLoad, bool additive = false) {
+        public SceneLoader (string sceneToLoad, bool additive = false, bool setActive = false) {
+            loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
             this.sceneToLoad = sceneToLoad;
-            loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
+            this.setActive = setActive;
+            this.setActive = setActive;
         }
 
-        public SceneLoader (string sceneToLoad, string sceneToUnload, bool additive = false) {
+        public SceneLoader (string sceneToLoad, string sceneToUnload, bool additive = false, bool setActive = false) {
+            loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
             this.sceneToLoad = sceneToLoad;
             this.sceneToUnload = sceneToUnload;
-            loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
+            this.setActive = setActive;
         }
 
         public void StartLoading (MonoBehaviour owner) {
@@ -93,6 +98,16 @@ namespace DouduckLib {
                     }
                     yield return null;
                 }
+            }
+
+            if (setActive && !string.IsNullOrEmpty (sceneToLoad)) {
+                yield return new WaitForEndOfFrame ();
+                var activeScene = SceneManager.GetSceneByPath (sceneToLoad);
+                SceneManager.SetActiveScene (activeScene);
+            } else if (setActive && sceneIndexToLoad > -1) {
+                yield return null;
+                var activeScene = SceneManager.GetSceneByBuildIndex (sceneIndexToLoad);
+                SceneManager.SetActiveScene (activeScene);
             }
 
             isLoadingScene = false;

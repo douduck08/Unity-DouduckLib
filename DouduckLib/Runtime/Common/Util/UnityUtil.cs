@@ -13,10 +13,14 @@ namespace DouduckLib {
             }
         }
 
-        public static IEnumerable<Scene> GetAllLoadedScenes () {
+        public static IEnumerable<Scene> GetAllScenes () {
             for (int i = 0; i < SceneManager.sceneCount; i++) {
                 yield return SceneManager.GetSceneAt (i);
             }
+        }
+
+        public static IEnumerable<Scene> GetAllLoadedScenes () {
+            return GetAllScenes ().Where (s => s.isLoaded);
         }
 
         /// <summary>
