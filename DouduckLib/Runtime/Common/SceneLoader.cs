@@ -70,14 +70,20 @@ namespace DouduckLib {
 
             AsyncOperation unloadop = null;
             if (!string.IsNullOrEmpty (sceneToUnload)) {
-                unloadop = SceneManager.UnloadSceneAsync (sceneToUnload);
-                while (!unloadop.isDone) {
-                    yield return null;
+                var scene = SceneManager.GetSceneByPath (sceneToUnload);
+                if (scene.isLoaded) {
+                    unloadop = SceneManager.UnloadSceneAsync (sceneToUnload);
+                    while (!unloadop.isDone) {
+                        yield return null;
+                    }
                 }
             } else if (sceneIndexToUnload > -1) {
-                unloadop = SceneManager.UnloadSceneAsync (sceneIndexToUnload);
-                while (!unloadop.isDone) {
-                    yield return null;
+                var scene = SceneManager.GetSceneByBuildIndex (sceneIndexToUnload);
+                if (scene.isLoaded) {
+                    unloadop = SceneManager.UnloadSceneAsync (sceneIndexToUnload);
+                    while (!unloadop.isDone) {
+                        yield return null;
+                    }
                 }
             }
 
