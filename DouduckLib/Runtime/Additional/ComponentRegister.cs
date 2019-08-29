@@ -5,8 +5,9 @@ using UnityEngine;
 namespace DouduckLib {
     public abstract class ComponentRegister<T> : MonoBehaviour where T : MonoBehaviour {
         class CompomentData {
-            public string sceneName;
             public string name;
+            public string sceneName;
+            public string scenePath;
             public MonoBehaviour component;
         }
 
@@ -21,7 +22,12 @@ namespace DouduckLib {
 
         static void InternalAddComponent (MonoBehaviour component) {
             lock (_lock) {
-                _componentList.Add (new CompomentData () { component = component, name = component.name, sceneName = component.gameObject.scene.name });
+                _componentList.Add (new CompomentData () {
+                    component = component,
+                        name = component.name,
+                        sceneName = component.gameObject.scene.name,
+                        scenePath = component.gameObject.scene.path
+                });
             }
         }
 
@@ -38,6 +44,14 @@ namespace DouduckLib {
 
         public static T GetComponentFromSceneName (string sceneName) {
             var data = _componentList.Find (p => p.sceneName == sceneName);
+            if (data != null) {
+                return data.component as T;
+            }
+            return null;
+        }
+
+        public static T GetComponentFromScenePath (string scenePath) {
+            var data = _componentList.Find (p => p.scenePath == scenePath);
             if (data != null) {
                 return data.component as T;
             }

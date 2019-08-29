@@ -4,6 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// === Start Coroutine to Load SceneB ===
+// # SceneA: OnDisable
+// # SceneA: OnDistroy
+// SceneManager.SceneUnoaded triggered
+// # SceneB: Awake
+// # SceneB: OnEnable
+// SceneManager.SceneLoaded triggered
+// SceneManager.ActiveSceneChanged triggered
+// # SceneB: Start
+// # SceneB: Update
+// === Coroutine End ===
+// # SceneB: LateUpdate
+
 namespace DouduckLib {
     public class SceneLoader {
         public event Action onStartLoading;
@@ -48,15 +61,19 @@ namespace DouduckLib {
             this.setActive = setActive;
         }
 
-        public void StartLoading (MonoBehaviour owner) {
+        public void StartLoading (MonoBehaviour owner = null) {
             if (isLoadingScene || isLoadingOver) {
                 return;
             }
             if (owner == null) {
-                // TODO: generate a gameobject if owner is null
-                return;
+                CoroutineCarrier.StartCoroutineOnDontDestroy (LoadingScene ());
+            } else {
+                owner.StartCoroutine (LoadingScene ());
             }
-            owner.StartCoroutine (LoadingScene ());
+        }
+
+        void DestroyDependGameObject (GameObject go) {
+            GameObject.Destroy (go);
         }
 
         IEnumerator LoadingScene () {
