@@ -22,7 +22,7 @@ namespace DouduckLib {
                 scenesToLoad.Remove (scene.path);
             }
             for (int i = 0; i < scenesToLoad.Count; i++) {
-                new SceneLoader (scenesToLoad[i], true, scenesToLoad[i] == activeScene).StartLoading (this);
+                new SceneLoader (scenesToLoad[i], true, scenesToLoad[i] == activeScene).StartProcessing (this);
             }
         }
 
@@ -32,7 +32,7 @@ namespace DouduckLib {
                 scenesToUnload.Remove (scenePath);
             }
             for (int i = 0; i < scenesToUnload.Count; i++) {
-                new SceneLoader ("", scenesToUnload[i]).StartLoading (this);
+                new SceneLoader ("", scenesToUnload[i]).StartProcessing (this);
             }
         }
     }

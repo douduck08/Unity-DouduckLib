@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckLib {
-    public class CoroutineCarrier : SingletonMonoAuto<CoroutineCarrier> {
+    public class CoroutineUtil : SingletonMonoAuto<CoroutineUtil> {
         protected internal override void OnSingletonAwake () {
             MarkAsCrossSceneSingleton ();
         }

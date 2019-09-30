@@ -19,6 +19,26 @@ using UnityEngine.SceneManagement;
 
 namespace DouduckLib {
     public class SceneLoader {
+
+        class SceneIndexList : List<int> {
+            public bool AddSceneByPath (string path) {
+                var buildIndex = SceneUtility.GetBuildIndexByScenePath (path);
+                if (buildIndex > -1) {
+                    Add (buildIndex);
+                    return true;
+                }
+                return false;
+            }
+
+            public bool AddSceneByIndex (int index) {
+                if (index > -1) {
+                    Add (index);
+                    return true;
+                }
+                return false;
+            }
+        }
+
         public event Action onStartLoading;
         public event Action onFinishLoading;
         public event Action<Scene> onSceneUnloaded;
@@ -29,51 +49,102 @@ namespace DouduckLib {
         public bool isLoadingScene { get; protected set; }
         public bool isLoadingOver { get; protected set; }
 
-        int sceneIndexToLoad = -1;
-        int sceneIndexToUnload = -1;
-        string sceneToLoad;
-        string sceneToUnload;
+        // int sceneIndexToLoad = -1;
+        // int sceneIndexToUnload = -1;
+        // string sceneToLoad;
+        // string sceneToUnload;
+
         bool setActive;
+        SceneIndexList loadList = new SceneIndexList ();
+        SceneIndexList unloadList = new SceneIndexList ();
 
-        public SceneLoader (int sceneToLoad, bool additive = false, bool setActive = false) {
+        public SceneLoader (bool additive = false, bool setActive = false) {
             loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
-            this.sceneIndexToLoad = sceneToLoad;
             this.setActive = setActive;
         }
 
-        public SceneLoader (int sceneToLoad, int sceneToUnload, bool additive = false, bool setActive = false) {
+        public SceneLoader (int loadSceneIndex, bool additive = false, bool setActive = false) {
             loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
-            this.sceneIndexToLoad = sceneToLoad;
-            this.sceneIndexToUnload = sceneToUnload;
+            this.setActive = setActive;
+            loadList.AddSceneByIndex (loadSceneIndex);
         }
 
-        public SceneLoader (string sceneToLoad, bool additive = false, bool setActive = false) {
+        public SceneLoader (int loadSceneIndex, int unloadSceneIndex, bool additive = false, bool setActive = false) {
             loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
-            this.sceneToLoad = sceneToLoad;
-            this.setActive = setActive;
-            this.setActive = setActive;
+            loadList.AddSceneByIndex (loadSceneIndex);
+            unloadList.AddSceneByIndex (unloadSceneIndex);
         }
 
-        public SceneLoader (string sceneToLoad, string sceneToUnload, bool additive = false, bool setActive = false) {
+        public SceneLoader (string loadScenePath, bool additive = false, bool setActive = false) {
             loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
-            this.sceneToLoad = sceneToLoad;
-            this.sceneToUnload = sceneToUnload;
             this.setActive = setActive;
+            loadList.AddSceneByPath (loadScenePath);
         }
 
-        public void StartLoading (MonoBehaviour owner = null) {
+        public SceneLoader (string loadScenePath, string unloadScenePath, bool additive = false, bool setActive = false) {
+            loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
+            this.setActive = setActive;
+            loadList.AddSceneByPath (loadScenePath);
+            unloadList.AddSceneByPath (unloadScenePath);
+        }
+
+        public SceneLoader AddLoadSceneByPath (string path) {
+            loadList.AddSceneByPath (path);
+            return this;
+        }
+
+        public SceneLoader AddLoadSceneByIndex (int index) {
+            loadList.AddSceneByIndex (index);
+            return this;
+        }
+
+        public SceneLoader AddLoadSceneByPath (IEnumerable<string> paths) {
+            foreach (var path in paths) {
+                loadList.AddSceneByPath (path);
+            }
+            return this;
+        }
+
+        public SceneLoader AddLoadSceneByIndex (IEnumerable<int> indexes) {
+            foreach (var index in indexes) {
+                loadList.AddSceneByIndex (index);
+            }
+            return this;
+        }
+
+        public SceneLoader AddUnloadSceneByPath (string path) {
+            unloadList.AddSceneByPath (path);
+            return this;
+        }
+
+        public SceneLoader AddUnloadSceneByIndex (int index) {
+            unloadList.AddSceneByIndex (index);
+            return this;
+        }
+
+        public SceneLoader AddUnloadSceneByPath (IEnumerable<string> paths) {
+            foreach (var path in paths) {
+                unloadList.AddSceneByPath (path);
+            }
+            return this;
+        }
+
+        public SceneLoader AddUnloadSceneByIndex (IEnumerable<int> indexes) {
+            foreach (var index in indexes) {
+                unloadList.AddSceneByIndex (index);
+            }
+            return this;
+        }
+
+        public void StartProcessing (MonoBehaviour owner = null) {
             if (isLoadingScene || isLoadingOver) {
                 return;
             }
             if (owner == null) {
-                CoroutineCarrier.StartCoroutineOnDontDestroy (LoadingScene ());
+                CoroutineUtil.StartCoroutineOnDontDestroy (LoadingScene ());
             } else {
                 owner.StartCoroutine (LoadingScene ());
             }
-        }
-
-        void DestroyDependGameObject (GameObject go) {
-            GameObject.Destroy (go);
         }
 
         IEnumerator LoadingScene () {
@@ -85,52 +156,55 @@ namespace DouduckLib {
             SceneManager.sceneLoaded += TriggerSceneLoaded;
             SceneManager.sceneUnloaded += TriggerSceneUnloaded;
 
-            AsyncOperation unloadop = null;
-            if (!string.IsNullOrEmpty (sceneToUnload)) {
-                var scene = SceneManager.GetSceneByPath (sceneToUnload);
-                if (scene.isLoaded) {
-                    unloadop = SceneManager.UnloadSceneAsync (sceneToUnload);
-                    while (!unloadop.isDone) {
-                        yield return null;
-                    }
-                }
-            } else if (sceneIndexToUnload > -1) {
-                var scene = SceneManager.GetSceneByBuildIndex (sceneIndexToUnload);
-                if (scene.isLoaded) {
-                    unloadop = SceneManager.UnloadSceneAsync (sceneIndexToUnload);
-                    while (!unloadop.isDone) {
-                        yield return null;
-                    }
+            var unloadOps = new List<AsyncOperation> ();
+            for (int i = 0; i < unloadList.Count; i++) {
+                if (unloadList[i] > -1) {
+                    unloadOps.Add (SceneManager.UnloadSceneAsync (unloadList[i]));
                 }
             }
 
-            AsyncOperation loadop = null;
-            if (!string.IsNullOrEmpty (sceneToLoad)) {
-                loadop = SceneManager.LoadSceneAsync (sceneToLoad, loadSceneMode);
-                while (!loadop.isDone) {
-                    if (onUpdateProgress != null) {
-                        onUpdateProgress.Invoke (loadop.progress);
-                    }
-                    yield return null;
-                }
-            } else if (sceneIndexToLoad > -1) {
-                loadop = SceneManager.LoadSceneAsync (sceneIndexToLoad, loadSceneMode);
-                while (!loadop.isDone) {
-                    if (onUpdateProgress != null) {
-                        onUpdateProgress.Invoke (loadop.progress);
-                    }
-                    yield return null;
-                }
-            }
-
-            if (setActive && !string.IsNullOrEmpty (sceneToLoad)) {
-                yield return new WaitForEndOfFrame ();
-                var activeScene = SceneManager.GetSceneByPath (sceneToLoad);
-                SceneManager.SetActiveScene (activeScene);
-            } else if (setActive && sceneIndexToLoad > -1) {
+            while (unloadOps.Count > 0) {
                 yield return null;
-                var activeScene = SceneManager.GetSceneByBuildIndex (sceneIndexToLoad);
-                SceneManager.SetActiveScene (activeScene);
+                for (int i = unloadOps.Count - 1; i >= 0; i--) {
+                    if (unloadOps[i].isDone) {
+                        unloadOps.RemoveAt (i);
+                    }
+                }
+            }
+
+            var loadOps = new List<AsyncOperation> ();
+            for (int i = 0; i < loadList.Count; i++) {
+                if (loadList[i] > -1) {
+                    loadOps.Add (SceneManager.LoadSceneAsync (loadList[i], loadSceneMode));
+                }
+            }
+
+            var loadOpsCount = loadOps.Count;
+            while (loadOps.Count > 0) {
+                yield return null;
+
+                var totalProgress = 0f;
+                for (int i = loadOps.Count - 1; i >= 0; i--) {
+                    if (loadOps[i].isDone) {
+                        loadOps.RemoveAt (i);
+                    } else {
+                        totalProgress += loadOps[i].progress;
+                    }
+                }
+
+                totalProgress = (totalProgress + 1f * (loadOpsCount - loadOps.Count)) / loadOpsCount;
+                if (onUpdateProgress != null) {
+                    onUpdateProgress.Invoke (totalProgress);
+                }
+            }
+
+            if (setActive) {
+                for (int i = 0; i < loadList.Count; i++) {
+                    if (loadList[i] > -1) {
+                        var activeScene = SceneManager.GetSceneByBuildIndex (loadList[i]);
+                        SceneManager.SetActiveScene (activeScene);
+                    }
+                }
             }
 
             isLoadingScene = false;
