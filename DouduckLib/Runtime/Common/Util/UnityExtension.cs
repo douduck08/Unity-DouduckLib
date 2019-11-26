@@ -17,5 +17,9 @@ namespace DouduckLib {
             go_.transform.SetParent (parent);
         }
 #endif
+
+        public static bool IsPrefab (this GameObject go) {
+            return go.scene.rootCount == 0;
+        }
     }
 }
