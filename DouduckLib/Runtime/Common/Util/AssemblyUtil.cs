@@ -27,6 +27,51 @@ namespace DouduckLib {
             return m_AssemblyTypes;
         }
 
+        public static List<T> FindAllInstances<T> (Object root, int depthLimit = 10) where T : class {
+            var result = new List<T> ();
+            FindAllInstances_Internal (root, null, depthLimit, new HashSet<Object> (), result);
+            return result;
+        }
+
+        public static List<T> FindAllInstances<T> (Object root, Func<Object, bool> validate = null, int depthLimit = 10) where T : class {
+            var result = new List<T> ();
+            FindAllInstances_Internal (root, validate, depthLimit, new HashSet<Object> (), result);
+            return result;
+        }
+
+        static void FindAllInstances_Internal<T> (Object instance, Func<Object, bool> validate, int depthLimit, HashSet<Object> travledObjects, List<T> foundObjects) where T : class {
+            if (instance == null) return;
+            if (depthLimit < 1) return;
+            if (travledObjects.Contains (instance)) return;
+
+            travledObjects.Add (instance);
+
+            if (validate != null && !validate.Invoke (instance)) {
+                return;
+            }
+
+            var target = instance as T;
+            if (target != null) {
+                foundObjects.Add (target);
+            }
+
+            var collection = instance as IEnumerable;
+            if (collection != null) {
+                int index = 0;
+                foreach (var item in collection) {
+                    FindAllInstances_Internal (item, validate, depthLimit - 1, travledObjects, foundObjects);
+                    index++;
+                }
+            } else {
+                var instanceType = instance.GetType ();
+                var fields = instanceType.GetFields (BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                foreach (var field in fields) {
+                    FindAllInstances_Internal (field.GetValue (instance), validate, depthLimit - 1, travledObjects, foundObjects);
+                }
+            }
+        }
+
+        [System.Obsolete ("Use new functional method")]
         public static void FindAllInstances<T> (Object root, Action<T, string> callback, Func<Object, string, bool> validate = null, string path = "root", int depthLimit = 10) where T : class {
             FindAllInstances_Internal (root, new HashSet<Object> (), callback, validate, path, depthLimit);
         }
