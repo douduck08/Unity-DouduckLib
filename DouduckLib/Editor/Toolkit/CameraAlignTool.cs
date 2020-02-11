@@ -12,21 +12,31 @@ namespace DouduckLibEditor {
         }
 
         static void Update () {
-            if (alignToggle) {
+            if (alignMain) {
                 AlignMainCameraWithScene ();
+            } else if (alignView) {
+                AlignSceneCameraWithGame ();
             }
         }
 
-        static bool alignToggle;
-        const string path = "Edit/Keep Aligning Main Camera With Scene View";
+        static bool alignMain;
+        static bool alignView;
+        const string path1 = "Edit/Keep Aligning Main Camera With Scene View";
+        const string path2 = "Edit/Keep Aligning Scene View With Main Camera";
 
-        [MenuItem (path, false, 21)]
+        [MenuItem (path1, false, 21)]
         static void ToggleAlignMainCameraWithScene () {
-            alignToggle = !alignToggle;
-            Menu.SetChecked (path, alignToggle);
+            alignMain = !alignMain;
+            Menu.SetChecked (path2, alignMain);
         }
 
-        [MenuItem ("Edit/Align Main Camera With Scene View", false, 22)]
+        [MenuItem (path1, false, 21)]
+        static void ToggleAlignSceneCameraWithGame () {
+            alignView = !alignView;
+            Menu.SetChecked (path2, alignView);
+        }
+
+        [MenuItem ("Edit/Align Main Camera With Scene View", false, 23)]
         static void AlignMainCameraWithScene () {
             var sceneViewCamera = SceneView.lastActiveSceneView.camera;
             var mainCamera = Camera.main;
@@ -36,7 +46,7 @@ namespace DouduckLibEditor {
             }
         }
 
-        [MenuItem ("Edit/Align Scene Camera With Game View", false, 23)]
+        [MenuItem ("Edit/Align Scene Camera With Game View", false, 24)]
         static void AlignSceneCameraWithGame () {
             var sceneView = SceneView.lastActiveSceneView;
             sceneView.orthographic = Camera.main.orthographic;
