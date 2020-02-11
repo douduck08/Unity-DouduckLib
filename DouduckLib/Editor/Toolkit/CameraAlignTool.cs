@@ -30,7 +30,7 @@ namespace DouduckLibEditor {
             Menu.SetChecked (path2, alignMain);
         }
 
-        [MenuItem (path1, false, 21)]
+        [MenuItem (path1, false, 22)]
         static void ToggleAlignSceneCameraWithGame () {
             alignView = !alignView;
             Menu.SetChecked (path2, alignView);
