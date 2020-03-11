@@ -1,7 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
-using DouduckLib;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace DouduckLib {
     public interface ISceneSaveProcessing {
@@ -9,7 +11,7 @@ namespace DouduckLib {
     }
 
 #if UNITY_EDITOR
-    public class SceneSaveProcessor : UnityEditor.AssetPostprocessor {
+    public class SceneSaveProcessor : AssetPostprocessor {
         static void OnPostprocessAllAssets (string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths) {
             foreach (string path in importedAssets) {
                 if (Path.GetExtension (path).Equals (".unity")) {

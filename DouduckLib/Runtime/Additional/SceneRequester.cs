@@ -26,7 +26,7 @@ namespace DouduckLib {
             }
         }
 
-        public void UnloadSceneOutOfList () {
+        public void UnloadSceneNotInList () {
             var scenesToUnload = UnityUtil.GetAllLoadedScenes ().Select (p => p.path).ToList ();
             foreach (var scenePath in sceneAssets) {
                 scenesToUnload.Remove (scenePath);
