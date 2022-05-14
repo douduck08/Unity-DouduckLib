@@ -8,22 +8,24 @@ namespace DouduckLib {
         public event Action<EventDrivenState> onStateEnter;
         public event Action<EventDrivenState> onStateUpdate;
         public event Action<EventDrivenState> onStateExit;
-        public event Func<EventDrivenState, EventDrivenState> getNextState;
 
-        public override void OnStateEnter () {
+        Func<EventDrivenState, EventDrivenState> _getNextState;
+        public Func<EventDrivenState, EventDrivenState> getNextState { set => _getNextState = value; }
+
+        internal override void OnStateEnter () {
             onStateEnter?.Invoke (this);
         }
 
-        public override void OnStateUpdate () {
+        internal override void OnStateUpdate () {
             onStateUpdate?.Invoke (this);
         }
 
-        public override void OnStateExit () {
+        internal override void OnStateExit () {
             onStateExit?.Invoke (this);
         }
 
-        public override IState GetNextState () {
-            return getNextState?.Invoke (this);
+        internal override StateBase GetNextState () {
+            return _getNextState?.Invoke (this);
         }
 
         public void SetComplete () {

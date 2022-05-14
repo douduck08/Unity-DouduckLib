@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace DouduckLib {
     public sealed class StackedStateController : IStateController {
-        Stack<IState> stateStack;
-        public IState currentState {
+        Stack<StateBase> stateStack;
+        public StateBase currentState {
             get {
                 if (stateStack.Count > 0)
                     return stateStack.Peek ();
@@ -16,14 +16,14 @@ namespace DouduckLib {
         }
 
         public StackedStateController () {
-            stateStack = new Stack<IState> ();
+            stateStack = new Stack<StateBase> ();
         }
-        public StackedStateController (IState startState) {
-            stateStack = new Stack<IState> ();
+        public StackedStateController (StateBase startState) {
+            stateStack = new Stack<StateBase> ();
             SetState (startState);
         }
 
-        public void SetState (IState state) {
+        public void SetState (StateBase state) {
             if (stateStack.Count > 0) {
                 stateStack.Pop ();
             }
@@ -33,7 +33,7 @@ namespace DouduckLib {
             }
         }
 
-        public void PushState (IState state) {
+        public void PushState (StateBase state) {
             if (state == null) {
                 return;
             }

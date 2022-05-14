@@ -4,19 +4,19 @@ using System.Collections.Generic;
 
 namespace DouduckLib {
     public sealed class StateController : IStateController {
-        IState _currentState = null;
-        public IState currentState {
+        StateBase _currentState = null;
+        public StateBase currentState {
             get {
                 return _currentState;
             }
         }
 
         public StateController () { }
-        public StateController (IState startState) {
+        public StateController (StateBase startState) {
             SetState (startState);
         }
 
-        public void SetState (IState state) {
+        public void SetState (StateBase state) {
             if (state != null) {
                 state.Reset (this);
                 _currentState = state;

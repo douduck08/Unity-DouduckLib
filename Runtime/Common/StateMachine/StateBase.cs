@@ -4,22 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckLib {
-    public interface IState {
-        IStateController controller { get; }
-        bool isStarted { get; }
-        bool isCompleted { get; }
-        void Reset (IStateController controller);
-        void StateUpdate ();
-        IState GetNextState ();
-    }
-
     public interface IStateController {
-        IState currentState { get; }
-        void SetState (IState state);
+        StateBase currentState { get; }
+        void SetState (StateBase state);
         void StateUpdate ();
     }
 
-    public abstract class StateBase : IState {
+    public abstract class StateBase {
         IStateController _controller;
         bool _isStarted = false;
         bool _isCompleted = false;
@@ -28,13 +19,13 @@ namespace DouduckLib {
         public bool isStarted { get => isStarted; }
         public bool isCompleted { get => _isCompleted; }
 
-        public void Reset (IStateController controller) {
+        internal void Reset (IStateController controller) {
             _controller = controller;
             _isStarted = false;
             _isCompleted = false;
         }
 
-        public void StateUpdate () {
+        internal void StateUpdate () {
             if (!_isStarted) {
                 _isStarted = true;
                 OnStateEnter ();
@@ -51,11 +42,11 @@ namespace DouduckLib {
             _isCompleted = true;
         }
 
-        public abstract IState GetNextState ();
+        internal abstract StateBase GetNextState ();
 
-        public virtual void OnStateEnter () { }
-        public virtual void OnStateUpdate () { }
-        public virtual void OnStateExit () { }
+        internal virtual void OnStateEnter () { }
+        internal virtual void OnStateUpdate () { }
+        internal virtual void OnStateExit () { }
 
         public override string ToString () {
             return string.Format ("<State>{0}", this.GetType ().Name);
