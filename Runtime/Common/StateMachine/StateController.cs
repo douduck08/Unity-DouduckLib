@@ -18,7 +18,7 @@ namespace DouduckLib {
 
         public void SetState (IState state) {
             if (state != null) {
-                state.controller = this;
+                state.Reset (this);
                 _currentState = state;
             }
         }

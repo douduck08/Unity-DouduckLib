@@ -4,29 +4,34 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckLib {
-    public abstract class State : IState {
-        internal IStateController _controller;
-        public IStateController controller {
-            get {
-                return _controller;
-            }
-            set {
-                _controller = value;
-            }
-        }
+    public interface IState {
+        IStateController controller { get; }
+        bool isStarted { get; }
+        bool isCompleted { get; }
+        void Reset (IStateController controller);
+        void StateUpdate ();
+        IState GetNextState ();
+    }
 
+    public interface IStateController {
+        IState currentState { get; }
+        void SetState (IState state);
+        void StateUpdate ();
+    }
+
+    public abstract class StateBase : IState {
+        IStateController _controller;
         bool _isStarted = false;
-        public bool isStarted {
-            get {
-                return isStarted;
-            }
-        }
-
         bool _isCompleted = false;
-        public bool isCompleted {
-            get {
-                return _isCompleted;
-            }
+
+        public IStateController controller { get => _controller; }
+        public bool isStarted { get => isStarted; }
+        public bool isCompleted { get => _isCompleted; }
+
+        public void Reset (IStateController controller) {
+            _controller = controller;
+            _isStarted = false;
+            _isCompleted = false;
         }
 
         public void StateUpdate () {
