@@ -2,7 +2,7 @@
     "name": "com.douduck08.douduck-lib",
     "displayName": "Douduck Lib",
     "version": "0.0.1",
-    "unity": "2018.1",
-    "description": "Unity develop toolbox of douduck08.",
+    "unity": "2019.4",
+    "description": "Unity development toolkit by douduck08.",
     "dependencies": {}
 }
