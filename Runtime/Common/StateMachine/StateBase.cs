@@ -11,13 +11,13 @@ namespace DouduckLib {
     }
 
     public abstract class StateBase {
+        public IStateController controller => _controller;
+        public bool isStarted => isStarted;
+        public bool isCompleted => _isCompleted;
+
         IStateController _controller;
         bool _isStarted = false;
         bool _isCompleted = false;
-
-        public IStateController controller { get => _controller; }
-        public bool isStarted { get => isStarted; }
-        public bool isCompleted { get => _isCompleted; }
 
         internal void Reset (IStateController controller) {
             _controller = controller;

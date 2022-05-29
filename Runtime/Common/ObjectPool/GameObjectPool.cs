@@ -4,94 +4,73 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckLib {
-    public class GameObjectPool<TObject> : GameObjectPoolBase<TObject>, IObjectPool<TObject> where TObject : Component {
-
-        Action<TObject> m_setter;
-
-        public GameObjectPool (GameObjectPoolSetting<TObject> setting) : this (setting.poolSetting, setting.prefab) { }
-        public GameObjectPool (GameObjectPoolSetting<TObject> setting, Action<TObject> setter) : this (setting.poolSetting, setting.prefab, setter) { }
-
-        public GameObjectPool (ObjectPoolSettings settings, TObject prefab) {
-            Initialize (settings, prefab);
-        }
-
-        public GameObjectPool (ObjectPoolSettings settings, TObject prefab, Action<TObject> setter) {
-            if (setter == null) {
-                throw new ArgumentNullException ("[ObjectPool] setter cannot be null");
-            }
-            m_setter = setter;
-            Initialize (settings, prefab);
-        }
-
-        public TObject Spawn () {
-            var item = GetInternal ();
-            if (m_setter != null) {
-                m_setter.Invoke (item);
-            }
-            return item;
-        }
+    public interface IPooledComponent<TInitParam, TSpawnParam> {
+        void OnCreateFromPool (TInitParam initParam);
+        void OnSpawnFromPool (TSpawnParam spawnParam);
+        void OnReturnToPool ();
     }
 
-    public class GameObjectPool<TObject, TParam1> : GameObjectPoolBase<TObject>, IObjectPool<TObject, TParam1> where TObject : Component {
+    public class GameObjectPool<TObject, TInitParam, TSpawnParam> where TObject : Component, IPooledComponent<TInitParam, TSpawnParam> {
 
-        Action<TObject, TParam1> m_setter;
+        public TObject prefab;
+        public int initialSize;
+        public Transform instantiatePatent;
+        public TInitParam initialParam;
 
-        public GameObjectPool (GameObjectPoolSetting<TObject> setting, Action<TObject, TParam1> setter) : this (setting.poolSetting, setting.prefab, setter) { }
+        Stack<TObject> inactiveObjects;
+        HashSet<TObject> activeObjects;
 
-        public GameObjectPool (ObjectPoolSettings settings, TObject prefab, Action<TObject, TParam1> setter) {
-            if (setter == null) {
-                throw new ArgumentNullException ("[ObjectPool] setter cannot be null");
+        public int activeCount {
+            get {
+                return activeObjects.Count;
             }
-            m_setter = setter;
-            Initialize (settings, prefab);
+        }
+        public int inactiveCount {
+            get {
+                return inactiveObjects.Count;
+            }
+        }
+        public int totalCount {
+            get {
+                return activeCount + inactiveCount;
+            }
         }
 
-        public TObject Spawn (TParam1 param1) {
-            var item = GetInternal ();
-            m_setter.Invoke (item, param1);
+        public void InitializePool () {
+            inactiveObjects = new Stack<TObject> (initialSize);
+            activeObjects = new HashSet<TObject> ();
+            for (int i = 0; i < initialSize; i++) {
+                inactiveObjects.Push (AllocNew (false));
+            }
+        }
+
+        TObject AllocNew (bool active) {
+            var item = GameObject.Instantiate<TObject> (prefab, instantiatePatent);
+            item.OnCreateFromPool (initialParam);
+            item.gameObject.SetActive (active);
             return item;
         }
-    }
 
-    public class GameObjectPool<TObject, TParam1, TParam2> : GameObjectPoolBase<TObject>, IObjectPool<TObject, TParam1, TParam2> where TObject : Component {
-
-        Action<TObject, TParam1, TParam2> m_setter;
-
-        public GameObjectPool (GameObjectPoolSetting<TObject> setting, Action<TObject, TParam1, TParam2> setter) : this (setting.poolSetting, setting.prefab, setter) { }
-
-        public GameObjectPool (ObjectPoolSettings settings, TObject prefab, Action<TObject, TParam1, TParam2> setter) {
-            if (setter == null) {
-                throw new ArgumentNullException ("[ObjectPool] setter cannot be null");
+        public TObject Spawn (TSpawnParam spawnParam) {
+            if (inactiveObjects.Count == 0) {
+                var item = AllocNew (true);
+                item.OnSpawnFromPool (spawnParam);
+                activeObjects.Add (item);
+                return item;
+            } else {
+                var item = inactiveObjects.Pop ();
+                item.gameObject.SetActive (true);
+                item.OnSpawnFromPool (spawnParam);
+                activeObjects.Add (item);
+                return item;
             }
-            m_setter = setter;
-            Initialize (settings, prefab);
         }
 
-        public TObject Spawn (TParam1 param1, TParam2 param2) {
-            var item = GetInternal ();
-            m_setter.Invoke (item, param1, param2);
-            return item;
-        }
-    }
-
-    public class GameObjectPool<TObject, TParam1, TParam2, TParam3> : GameObjectPoolBase<TObject>, IObjectPool<TObject, TParam1, TParam2, TParam3> where TObject : Component {
-
-        Action<TObject, TParam1, TParam2, TParam3> m_setter;
-
-        public GameObjectPool (GameObjectPoolSetting<TObject> setting, Action<TObject, TParam1, TParam2, TParam3> setter) : this (setting.poolSetting, setting.prefab, setter) { }
-
-        public GameObjectPool (ObjectPoolSettings settings, TObject prefab, Action<TObject, TParam1, TParam2, TParam3> setter) {
-            if (setter == null) {
-                throw new ArgumentNullException ("[ObjectPool] setter cannot be null");
-            }
-            m_setter = setter;
-            Initialize (settings, prefab);
-        }
-
-        public TObject Spawn (TParam1 param1, TParam2 param2, TParam3 param3) {
-            var item = GetInternal ();
-            m_setter.Invoke (item, param1, param2, param3);
-            return item;
+        public void Despawn (TObject item) {
+            item.gameObject.SetActive (false);
+            item.OnReturnToPool ();
+            activeObjects.Remove (item);
+            inactiveObjects.Push (item);
         }
     }
 }
