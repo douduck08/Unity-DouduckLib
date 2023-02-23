@@ -1,17 +1,16 @@
 # Unity Random ToolBox - DouduckLib
-* Some common pattern
+* Common pattern
   * Singleton
   * State Machine
   * Object Pool
-  * Math function
-* Develop tools
-  * Attributes for inspector
-  * PrefabApplyProcessor
-  * SceneSaveProcessor
-* Additional
-  * SceneRequster
-  * ComponentRegister
-
+* Development toolkit
+  * Attributes
+  * AssetProcessor
+  * Additional Components
+  * Coroutine Helpers
+* Math function
+* Util function
+* UI elements
 
 ### Install to Unity Projects
 Use git submodule to install
