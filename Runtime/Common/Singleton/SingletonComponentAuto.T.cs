@@ -2,10 +2,10 @@
 using UnityEngine;
 
 namespace DouduckLib {
-    public abstract class SingletonMonoAuto<T> : SingletonMonoBase where T : SingletonMonoBase {
+    public abstract class SingletonComponentAuto<T> : SingletonComponentBase where T : SingletonComponentBase {
         private static T _instance;
         private static GameObject _gameObject;
-        private static object _lock = new object ();
+        private static object _lock = new object();
         private static bool _dontDestroyOnLoad = false;
         private static bool _applicationIsQuitting = false;
 
@@ -17,34 +17,35 @@ namespace DouduckLib {
 
                 lock (_lock) {
                     if (_instance == null) {
-                        _gameObject = new GameObject () { name = typeof (T).Name + " (Singleton)" };
-                        _instance = _gameObject.AddComponent<T> ();
-                        _instance.OnSingletonAwake ();
+                        _gameObject = new GameObject() { name = typeof(T).Name + " (Singleton)" };
+                        _instance = _gameObject.AddComponent<T>();
+                        _instance.OnSingletonAwake();
                     }
                     return _instance;
                 }
             }
         }
 
-        protected void MarkAsCrossSceneSingleton () {
+        protected void MarkAsCrossSceneSingleton() {
             _dontDestroyOnLoad = true;
-            DontDestroyOnLoad (_gameObject);
-            Debug.Log ("[Singleton] An instance of " + typeof (T) + "was marked as DontDestroyOnLoad.");
+            DontDestroyOnLoad(_gameObject);
+            Debug.Log("[Singleton] An instance of " + typeof(T) + "was marked as DontDestroyOnLoad.");
         }
 
-        protected void Awake () { }
+        protected void Awake() { }
 
-        protected void OnDestroy () {
+        protected void OnDestroy() {
             if (_dontDestroyOnLoad) {
                 _applicationIsQuitting = true;
-            } else {
+            }
+            else {
                 _instance = null;
                 _gameObject = null;
             }
-            OnSingletonDestroy ();
+            OnSingletonDestroy();
         }
 
-        protected void OnApplicationQuit () {
+        protected void OnApplicationQuit() {
             _applicationIsQuitting = true;
         }
     }
