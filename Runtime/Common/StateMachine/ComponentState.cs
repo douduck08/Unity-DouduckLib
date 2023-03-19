@@ -1,28 +1,10 @@
-﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckLib
 {
-    public interface IStateController
-    {
-        IState currentState { get; }
-        void SetState(IState state);
-        void StateUpdate();
-    }
-
-    public interface IState
-    {
-        IStateController controller { get; }
-        bool isStarted { get; }
-        bool isCompleted { get; }
-        void Reset(IStateController controller);
-        void StateUpdate();
-        IState GetNextState();
-    }
-
-    public abstract class StateBase : IState
+    public abstract class ComponentState : MonoBehaviour, IState
     {
         public IStateController controller => _controller;
         public bool isStarted => _isStarted;
@@ -66,10 +48,5 @@ namespace DouduckLib
         protected virtual void OnStateEnter() { }
         protected virtual void OnStateUpdate() { }
         protected virtual void OnStateExit() { }
-
-        public override string ToString()
-        {
-            return string.Format("<State>{0}", this.GetType().Name);
-        }
     }
 }

@@ -3,33 +3,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DouduckLib {
-    public class EventDrivenState : StateBase {
+namespace DouduckLib
+{
+    public class EventDrivenState : StateBase
+    {
         public event Action<EventDrivenState> onStateEnter;
         public event Action<EventDrivenState> onStateUpdate;
         public event Action<EventDrivenState> onStateExit;
 
         Func<EventDrivenState, EventDrivenState> _getNextState;
-        public Func<EventDrivenState, EventDrivenState> getNextState { set => _getNextState = value; }
 
-        internal override void OnStateEnter () {
-            onStateEnter?.Invoke (this);
+        public EventDrivenState SetNextStateFunction(Func<EventDrivenState, EventDrivenState> func)
+        {
+            _getNextState = func;
+            return this;
         }
 
-        internal override void OnStateUpdate () {
-            onStateUpdate?.Invoke (this);
+        public override IState GetNextState()
+        {
+            return _getNextState?.Invoke(this);
         }
 
-        internal override void OnStateExit () {
-            onStateExit?.Invoke (this);
+        public void SetComplete()
+        {
+            Complete();
         }
 
-        internal override StateBase GetNextState () {
-            return _getNextState?.Invoke (this);
+        protected override void OnStateEnter()
+        {
+            onStateEnter?.Invoke(this);
         }
 
-        public void SetComplete () {
-            Complete ();
+        protected override void OnStateUpdate()
+        {
+            onStateUpdate?.Invoke(this);
+        }
+
+        protected override void OnStateExit()
+        {
+            onStateExit?.Invoke(this);
         }
     }
 }
