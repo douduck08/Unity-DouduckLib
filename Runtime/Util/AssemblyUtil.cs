@@ -7,113 +7,147 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Object = System.Object;
 
-namespace DouduckLib {
-    public static class AssemblyUtil {
+namespace DouduckLib
+{
+    public static class AssemblyUtil
+    {
 
         static IEnumerable<Type> m_AssemblyTypes;
 
-        public static IEnumerable<Type> GetAllAssemblyTypes () {
-            if (m_AssemblyTypes == null) {
-                m_AssemblyTypes = AppDomain.CurrentDomain.GetAssemblies ()
-                    .SelectMany (t => {
+        public static IEnumerable<Type> GetAllAssemblyTypes()
+        {
+            if (m_AssemblyTypes == null)
+            {
+                m_AssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(t =>
+                    {
                         // Ugly hack to handle mis-versioned dlls
                         var innerTypes = new Type[0];
-                        try {
-                            innerTypes = t.GetTypes ();
-                        } catch { }
+                        try
+                        {
+                            innerTypes = t.GetTypes();
+                        }
+                        catch { }
                         return innerTypes;
                     });
             }
             return m_AssemblyTypes;
         }
 
-        public static List<T> FindAllInstances<T> (Object root, int depthLimit = 10) where T : class {
-            var result = new List<T> ();
-            FindAllInstances_Internal (root, null, depthLimit, new HashSet<Object> (), result);
+        public static List<T> FindAllInstances<T>(Object root, int depthLimit = 10) where T : class
+        {
+            var result = new List<T>();
+            FindAllInstances_Internal(root, null, depthLimit, new HashSet<Object>(), result);
             return result;
         }
 
-        public static List<T> FindAllInstances<T> (Object root, Func<Object, bool> validate = null, int depthLimit = 10) where T : class {
-            var result = new List<T> ();
-            FindAllInstances_Internal (root, validate, depthLimit, new HashSet<Object> (), result);
+        public static List<T> FindAllInstances<T>(Object root, Func<Object, bool> validate = null, int depthLimit = 10) where T : class
+        {
+            var result = new List<T>();
+            FindAllInstances_Internal(root, validate, depthLimit, new HashSet<Object>(), result);
             return result;
         }
 
-        static void FindAllInstances_Internal<T> (Object instance, Func<Object, bool> validate, int depthLimit, HashSet<Object> travledObjects, List<T> foundObjects) where T : class {
-            if (instance == null) return;
-            if (depthLimit < 1) return;
-            if (travledObjects.Contains (instance)) return;
+        static void FindAllInstances_Internal<T>(Object instance, Func<Object, bool> validate, int depthLimit, HashSet<Object> travledObjects, List<T> foundObjects) where T : class
+        {
+            if (instance == null)
+                return;
+            if (depthLimit < 1)
+                return;
+            if (travledObjects.Contains(instance))
+                return;
 
-            travledObjects.Add (instance);
+            travledObjects.Add(instance);
 
-            if (validate != null && !validate.Invoke (instance)) {
+            if (validate != null && !validate.Invoke(instance))
+            {
                 return;
             }
 
             var target = instance as T;
-            if (target != null) {
-                foundObjects.Add (target);
+            if (target != null)
+            {
+                foundObjects.Add(target);
             }
 
             var collection = instance as IEnumerable;
-            if (collection != null) {
+            if (collection != null)
+            {
                 int index = 0;
-                foreach (var item in collection) {
-                    FindAllInstances_Internal (item, validate, depthLimit - 1, travledObjects, foundObjects);
+                foreach (var item in collection)
+                {
+                    FindAllInstances_Internal(item, validate, depthLimit - 1, travledObjects, foundObjects);
                     index++;
                 }
-            } else {
-                var instanceType = instance.GetType ();
-                var fields = instanceType.GetFields (BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-                foreach (var field in fields) {
-                    FindAllInstances_Internal (field.GetValue (instance), validate, depthLimit - 1, travledObjects, foundObjects);
+            }
+            else
+            {
+                var instanceType = instance.GetType();
+                var fields = instanceType.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                foreach (var field in fields)
+                {
+                    FindAllInstances_Internal(field.GetValue(instance), validate, depthLimit - 1, travledObjects, foundObjects);
                 }
             }
         }
 
-        [System.Obsolete ("Use new functional method")]
-        public static void FindAllInstances<T> (Object root, Action<T, string> callback, Func<Object, string, bool> validate = null, string path = "root", int depthLimit = 10) where T : class {
-            FindAllInstances_Internal (root, new HashSet<Object> (), callback, validate, path, depthLimit);
+        [System.Obsolete("Use new functional method")]
+        public static void FindAllInstances<T>(Object root, Action<T, string> callback, Func<Object, string, bool> validate = null, string path = "root", int depthLimit = 10) where T : class
+        {
+            FindAllInstances_Internal(root, new HashSet<Object>(), callback, validate, path, depthLimit);
         }
 
-        static void FindAllInstances_Internal<T> (Object instance, HashSet<Object> travledObjects, Action<T, string> callback, Func<Object, string, bool> validate, string path, int depthLimit) where T : class {
-            if (instance == null) return;
-            if (depthLimit < 1) return;
-            if (travledObjects.Contains (instance)) return;
+        static void FindAllInstances_Internal<T>(Object instance, HashSet<Object> travledObjects, Action<T, string> callback, Func<Object, string, bool> validate, string path, int depthLimit) where T : class
+        {
+            if (instance == null)
+                return;
+            if (depthLimit < 1)
+                return;
+            if (travledObjects.Contains(instance))
+                return;
 
-            travledObjects.Add (instance);
+            travledObjects.Add(instance);
 
             var target = instance as T;
-            if (target != null) {
-                callback.Invoke (target, path);
+            if (target != null)
+            {
+                callback.Invoke(target, path);
             }
 
-            if (validate != null && !validate.Invoke (instance, path)) {
+            if (validate != null && !validate.Invoke(instance, path))
+            {
                 return;
             }
 
             var collection = instance as IEnumerable;
-            if (collection != null) {
+            if (collection != null)
+            {
                 int index = 0;
-                foreach (var item in collection) {
-                    FindAllInstances_Internal (item, travledObjects, callback, validate, string.Format ("{0}[{1}]", path, index), depthLimit - 1);
+                foreach (var item in collection)
+                {
+                    FindAllInstances_Internal(item, travledObjects, callback, validate, string.Format("{0}[{1}]", path, index), depthLimit - 1);
                     index++;
                 }
-            } else {
-                var instanceType = instance.GetType ();
-                var fields = instanceType.GetFields (BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-                foreach (var field in fields) {
-                    FindAllInstances_Internal (field.GetValue (instance), travledObjects, callback, validate, string.Format ("{0}/{1}", path, field.Name), depthLimit - 1);
+            }
+            else
+            {
+                var instanceType = instance.GetType();
+                var fields = instanceType.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                foreach (var field in fields)
+                {
+                    FindAllInstances_Internal(field.GetValue(instance), travledObjects, callback, validate, string.Format("{0}/{1}", path, field.Name), depthLimit - 1);
                 }
             }
 
         }
     }
 
-    public static class AssemblyExtenstion {
-        public static T GetAttribute<T> (this Type type) where T : Attribute {
-            Assert.IsTrue (type.IsDefined (typeof (T), false), "Attribute not found");
-            return (T) type.GetCustomAttributes (typeof (T), false) [0];
+    public static class AssemblyExtenstion
+    {
+        public static T GetAttribute<T>(this Type type) where T : Attribute
+        {
+            Assert.IsTrue(type.IsDefined(typeof(T), false), "Attribute not found");
+            return (T)type.GetCustomAttributes(typeof(T), false)[0];
         }
     }
 }

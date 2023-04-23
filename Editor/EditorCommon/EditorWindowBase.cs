@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace DouduckLibEditor {
-    public abstract class EditorWindowBase<T> : EditorWindow where T : EditorWindow {
+namespace DouduckLibEditor
+{
+    public abstract class EditorWindowBase<T> : EditorWindow where T : EditorWindow
+    {
 
-        protected static void Open (string title) {
-            T window = EditorWindow.GetWindow<T> (false, title, true);
-            window.minSize = new Vector2 (256, 256);
+        protected static void Open(string title)
+        {
+            T window = EditorWindow.GetWindow<T>(false, title, true);
+            window.minSize = new Vector2(256, 256);
         }
 
         protected Object target;
@@ -16,24 +19,29 @@ namespace DouduckLibEditor {
 
         Vector2 scrollPos;
 
-        void Initialize () {
-            if (target == null) {
+        void Initialize()
+        {
+            if (target == null)
+            {
                 target = this;
-                serializedObject = new SerializedObject (target);
+                serializedObject = new SerializedObject(target);
             }
         }
 
-        protected void OnFocus () {
-            Initialize ();
+        protected void OnFocus()
+        {
+            Initialize();
         }
 
-        protected void OnLostFocus () { }
+        protected void OnLostFocus() { }
 
-        protected abstract void OnDrawGUIBody ();
+        protected abstract void OnDrawGUIBody();
 
-        protected void OnGUI () {
-            using (new EditorGUILayout.HorizontalScope ()) {
-                EditorGUIWrapper.DrawHeader (titleContent.text);
+        protected void OnGUI()
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUIWrapper.DrawHeader(titleContent.text);
 
                 // TODO: menu item
                 // var gearStyle = new GUIStyle ("Icon.Options");
@@ -47,9 +55,10 @@ namespace DouduckLibEditor {
                 // }
             }
 
-            using (var scrollView = new EditorGUILayout.ScrollViewScope (scrollPos)) {
+            using (var scrollView = new EditorGUILayout.ScrollViewScope(scrollPos))
+            {
                 scrollPos = scrollView.scrollPosition;
-                OnDrawGUIBody ();
+                OnDrawGUIBody();
             }
         }
     }

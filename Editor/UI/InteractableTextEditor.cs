@@ -6,9 +6,11 @@ using UnityEditor;
 using UnityEditor.UI;
 using DouduckLib.UI;
 
-namespace DouduckLibEditor.UI {
-    [CanEditMultipleObjects, CustomEditor (typeof (InteractableText), true)]
-    public class InteractableTextEditor : GraphicEditor {
+namespace DouduckLibEditor.UI
+{
+    [CanEditMultipleObjects, CustomEditor(typeof(InteractableText), true)]
+    public class InteractableTextEditor : GraphicEditor
+    {
 
         GUIContent m_textContent;
         SerializedProperty m_nonParsedStr;
@@ -16,23 +18,25 @@ namespace DouduckLibEditor.UI {
         SerializedProperty m_raycastTarget;
         SerializedProperty m_onUrlClick;
 
-        protected override void OnEnable () {
-            base.OnEnable ();
-            this.m_textContent = new GUIContent ("Text");
-            this.m_nonParsedStr = base.serializedObject.FindProperty ("nonParsedStr");
-            this.m_fontData = base.serializedObject.FindProperty ("m_FontData");
-            this.m_raycastTarget = base.serializedObject.FindProperty ("m_RaycastTarget");
-            this.m_onUrlClick = base.serializedObject.FindProperty ("onUrlClick");
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            this.m_textContent = new GUIContent("Text");
+            this.m_nonParsedStr = base.serializedObject.FindProperty("nonParsedStr");
+            this.m_fontData = base.serializedObject.FindProperty("m_FontData");
+            this.m_raycastTarget = base.serializedObject.FindProperty("m_RaycastTarget");
+            this.m_onUrlClick = base.serializedObject.FindProperty("onUrlClick");
         }
 
-        public override void OnInspectorGUI () {
-            base.serializedObject.Update ();
-            EditorGUILayout.PropertyField (this.m_nonParsedStr, this.m_textContent);
-            EditorGUILayout.PropertyField (this.m_fontData);
-            base.AppearanceControlsGUI ();
-            EditorGUILayout.PropertyField (this.m_raycastTarget);
-            EditorGUILayout.PropertyField (this.m_onUrlClick);
-            base.serializedObject.ApplyModifiedProperties ();
+        public override void OnInspectorGUI()
+        {
+            base.serializedObject.Update();
+            EditorGUILayout.PropertyField(this.m_nonParsedStr, this.m_textContent);
+            EditorGUILayout.PropertyField(this.m_fontData);
+            base.AppearanceControlsGUI();
+            EditorGUILayout.PropertyField(this.m_raycastTarget);
+            EditorGUILayout.PropertyField(this.m_onUrlClick);
+            base.serializedObject.ApplyModifiedProperties();
         }
     }
 }

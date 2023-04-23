@@ -4,38 +4,49 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace DouduckLib {
-    public static class UnityUtil {
+namespace DouduckLib
+{
+    public static class UnityUtil
+    {
 
-        public static Scene ActiveScene {
-            get {
-                return SceneManager.GetActiveScene ();
+        public static Scene ActiveScene
+        {
+            get
+            {
+                return SceneManager.GetActiveScene();
             }
         }
 
-        public static IEnumerable<Scene> GetAllScenes () {
-            for (int i = 0; i < SceneManager.sceneCount; i++) {
-                yield return SceneManager.GetSceneAt (i);
+        public static IEnumerable<Scene> GetAllScenes()
+        {
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                yield return SceneManager.GetSceneAt(i);
             }
         }
 
-        public static IEnumerable<Scene> GetAllLoadedScenes () {
-            return GetAllScenes ().Where (s => s.isLoaded);
+        public static IEnumerable<Scene> GetAllLoadedScenes()
+        {
+            return GetAllScenes().Where(s => s.isLoaded);
         }
 
         /// <summary>
         /// This method include inactive GameObject, exclude DontDestory GameObject
         /// </summary>
-        public static IEnumerable<GameObject> GetRootGameObjects (Scene scene) {
-            return scene.GetRootGameObjects ();
+        public static IEnumerable<GameObject> GetRootGameObjects(Scene scene)
+        {
+            return scene.GetRootGameObjects();
         }
 
         /// <summary>
         /// This method include inactive GameObject, exclude DontDestory GameObject
         /// </summary>
-        public static IEnumerable<GameObject> GetRootGameObjects () {
-            foreach (Scene scene in GetAllLoadedScenes ()) {
-                foreach (GameObject go in GetRootGameObjects (scene)) {
+        public static IEnumerable<GameObject> GetRootGameObjects()
+        {
+            foreach (Scene scene in GetAllLoadedScenes())
+            {
+                foreach (GameObject go in GetRootGameObjects(scene))
+                {
                     yield return go;
                 }
             }
@@ -44,13 +55,18 @@ namespace DouduckLib {
         /// <summary>
         /// This method include inactive GameObject, exclude DontDestory GameObject
         /// </summary>
-        public static IEnumerable<Transform> GetAllTransforms () {
-            var rootObjects = GetRootGameObjects ();
-            foreach (Transform trans in rootObjects.Select (x => x.transform)) {
+        public static IEnumerable<Transform> GetAllTransforms()
+        {
+            var rootObjects = GetRootGameObjects();
+            foreach (Transform trans in rootObjects.Select(x => x.transform))
+            {
                 yield return trans;
-                if (trans.childCount > 0) {
-                    foreach (Transform child in trans.GetComponentsInChildren<Transform> (true)) {
-                        if (child != trans) {
+                if (trans.childCount > 0)
+                {
+                    foreach (Transform child in trans.GetComponentsInChildren<Transform>(true))
+                    {
+                        if (child != trans)
+                        {
                             yield return child;
                         }
                     }
@@ -61,9 +77,12 @@ namespace DouduckLib {
         /// <summary>
         /// This method include inactive GameObject, exclude DontDestory GameObject
         /// </summary>
-        public static IEnumerable<T> GetAllComponents<T> () where T : Behaviour {
-            foreach (Transform trans in GetAllTransforms ()) {
-                foreach (T t in trans.GetComponents<T> ()) {
+        public static IEnumerable<T> GetAllComponents<T>() where T : Behaviour
+        {
+            foreach (Transform trans in GetAllTransforms())
+            {
+                foreach (T t in trans.GetComponents<T>())
+                {
                     yield return t;
                 }
             }
@@ -72,8 +91,9 @@ namespace DouduckLib {
         /// <summary>
         /// This method include DontDestory GameObject, exclude inactive GameObject
         /// </summary>
-        public static IEnumerable<GameObject> GetAllActiveGameObjects () {
-            return GameObject.FindObjectsOfType<Transform> ().Select (x => x.gameObject);
+        public static IEnumerable<GameObject> GetAllActiveGameObjects()
+        {
+            return GameObject.FindObjectsOfType<Transform>().Select(x => x.gameObject);
         }
     }
 }
