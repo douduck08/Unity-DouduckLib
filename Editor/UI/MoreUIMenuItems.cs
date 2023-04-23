@@ -19,16 +19,6 @@ namespace DouduckLibEditor.UI
             Selection.activeObject = go;
         }
 
-        [MenuItem(uiMenuItemPath + "Interactable Text")]
-        static void CreateInteractableText(MenuCommand command)
-        {
-            var go = new GameObject("InteractableText");
-            go.AddComponent<InteractableText>();
-            GameObjectUtility.SetParentAndAlign(go, command.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(go, "Create" + go.name);
-            Selection.activeObject = go;
-        }
-
         [MenuItem(uiMenuItemPath + "Non-Raycast Image")]
         static void CreatImage(MenuCommand menuCommand)
         {
