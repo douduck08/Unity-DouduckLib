@@ -29,7 +29,9 @@ namespace DouduckLib
             }
             for (int i = 0; i < scenesToLoad.Count; i++)
             {
-                new SceneLoader(scenesToLoad[i], true, scenesToLoad[i] == activeScene).StartProcessing(this);
+                SceneLoader.Create(true, scenesToLoad[i] == activeScene)
+                    .AddSceneToLoadByPath(scenesToLoad[i])
+                    .StartProcessing(this);
             }
         }
 
@@ -42,7 +44,9 @@ namespace DouduckLib
             }
             for (int i = 0; i < scenesToUnload.Count; i++)
             {
-                new SceneLoader("", scenesToUnload[i]).StartProcessing(this);
+                SceneLoader.Create()
+                    .AddSceneToLoadByPath(scenesToUnload[i])
+                    .StartProcessing(this);
             }
         }
     }
