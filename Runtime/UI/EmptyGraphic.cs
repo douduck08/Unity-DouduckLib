@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace DouduckLib.UI
 {
+    [AddComponentMenu("UI/Others/EmptyGraphic", 16)]
     [RequireComponent(typeof(CanvasRenderer))]
     public class EmptyGraphic : MaskableGraphic
     {
@@ -12,6 +13,7 @@ namespace DouduckLib.UI
         {
             useLegacyMeshGeneration = false;
         }
+
         protected override void OnPopulateMesh(VertexHelper toFill)
         {
             toFill.Clear();

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace DouduckLib.UI
 {
-    [AddComponentMenu("UI/Effects/PolygonImage", 16)]
+    [AddComponentMenu("UI/Others/PolygonImage", 16)]
     [RequireComponent(typeof(Image))]
     public class PolygonImage : BaseMeshEffect, ICanvasRaycastFilter
     {

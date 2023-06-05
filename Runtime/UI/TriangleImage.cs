@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace DouduckLib.UI
 {
-    [AddComponentMenu("UI/Effects/TriangleImage", 16)]
+    [AddComponentMenu("UI/Others/TriangleImage", 16)]
     [RequireComponent(typeof(Image))]
     public class TriangleImage : BaseMeshEffect
     {
