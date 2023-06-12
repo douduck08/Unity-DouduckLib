@@ -5,23 +5,18 @@ using UnityEngine;
 
 namespace DouduckLib
 {
-    public class CoroutineUtil : SingletonComponentAuto<CoroutineUtil>
+    public class CoroutineUtil : GlobalSingletonComponent<CoroutineUtil>
     {
-        protected internal override void OnSingletonAwake()
-        {
-            MarkAsCrossSceneSingleton();
-        }
-
         public static void StartCoroutineOnDontDestroy(IEnumerator routine)
         {
-            instance.StartCoroutine(routine);
+            Get()?.StartCoroutine(routine);
         }
 
         public static void RunDelaySeconds(Action callback, float seconds)
         {
             if (callback != null)
             {
-                instance.StartCoroutine(DelaySeconds(callback, seconds));
+                Get()?.StartCoroutine(DelaySeconds(callback, seconds));
             }
         }
 
@@ -35,7 +30,7 @@ namespace DouduckLib
         {
             if (callback != null)
             {
-                instance.StartCoroutine(DelaySeconds(callback, frames));
+                Get()?.StartCoroutine(DelayFrames(callback, frames));
             }
         }
 
