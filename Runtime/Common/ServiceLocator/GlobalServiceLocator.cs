@@ -20,6 +20,17 @@ namespace DouduckLib
         List<IFixedUpdatable> IServiceLocator.FixedUpdatableList => fixedUpdatableList_;
         List<ILateUpdatable> IServiceLocator.LateUpdatableList => lateUpdatableList_;
 
+        protected override void OnSingletonAwake()
+        {
+            foreach (var preloadService in preloadServices)
+            {
+                if (!this.HasService(preloadService.GetType()))
+                {
+                    this.AddService(preloadService);
+                }
+            }
+        }
+
         void Update()
         {
             for (int i = updatableList_.Count - 1; i >= 0; i--)

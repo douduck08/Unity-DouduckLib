@@ -38,7 +38,7 @@ namespace DouduckLib
             return Get(component.gameObject);
         }
 
-        protected sealed override void OnSingletonAwake()
+        protected sealed override void OnSingletonAwakeInternal()
         {
             var sceneHandle = gameObject.scene.handle;
             if (!loacalInstance_.ContainsKey(sceneHandle))
@@ -55,7 +55,7 @@ namespace DouduckLib
             }
         }
 
-        protected sealed override void OnSingletonDestroy()
+        protected sealed override void OnSingletonDestroyInternal()
         {
             var sceneHandle = gameObject.scene.handle;
             loacalInstance_.Remove(sceneHandle);

@@ -46,15 +46,6 @@ namespace DouduckLib
             return serviceLocator.ServiceDictionary.ContainsKey(typeof(T)) ? (T)serviceLocator.ServiceDictionary[typeof(T)] : null;
         }
 
-        public static bool CreateService<T>(this IServiceLocator serviceLocator) where T : class, new()
-        {
-            if (serviceLocator.HasService<T>())
-            {
-                return false;
-            }
-            return serviceLocator.AddServiceInternal(new T());
-        }
-
         public static bool AddService<T>(this IServiceLocator serviceLocator, T service) where T : class
         {
             if (serviceLocator.HasService(service.GetType()))
@@ -64,6 +55,15 @@ namespace DouduckLib
             return serviceLocator.AddServiceInternal(service);
         }
 
+        public static bool CreateService<T>(this IServiceLocator serviceLocator) where T : class, new()
+        {
+            if (serviceLocator.HasService<T>())
+            {
+                return false;
+            }
+            return serviceLocator.AddServiceInternal(new T());
+        }
+
         public static bool CreateServiceComponent<T>(this IServiceLocator serviceLocator) where T : Component
         {
             if (serviceLocator.HasService<T>())
@@ -71,15 +71,6 @@ namespace DouduckLib
                 return false;
             }
             return serviceLocator.AddServiceInternal(serviceLocator.Owner.AddComponent<T>());
-        }
-
-        public static bool AddServiceComponent<T>(this IServiceLocator serviceLocator, T component) where T : Component
-        {
-            if (serviceLocator.HasService(component.GetType()))
-            {
-                return false;
-            }
-            return serviceLocator.AddServiceInternal(component);
         }
 
         static bool AddServiceInternal<T>(this IServiceLocator serviceLocator, T service) where T : class

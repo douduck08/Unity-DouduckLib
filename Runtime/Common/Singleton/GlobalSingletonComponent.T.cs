@@ -25,7 +25,7 @@ namespace DouduckLib
             }
         }
 
-        protected sealed override void OnSingletonAwake()
+        protected sealed override void OnSingletonAwakeInternal()
         {
             if (instance_ == null)
             {
@@ -41,7 +41,7 @@ namespace DouduckLib
             }
         }
 
-        protected sealed override void OnSingletonDestroy()
+        protected sealed override void OnSingletonDestroyInternal()
         {
             instance_ = null;
         }

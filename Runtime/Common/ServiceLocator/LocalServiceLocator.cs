@@ -7,6 +7,8 @@ namespace DouduckLib
 {
     public sealed class LocalServiceLocator : LocalSingletonComponent<LocalServiceLocator>, IServiceLocator
     {
+        [SerializeField] List<Component> preloadServices = new();
+
         private readonly Dictionary<Type, object> serviceDictionary_ = new();
         private readonly List<IUpdatable> updatableList_ = new();
         private readonly List<IFixedUpdatable> fixedUpdatableList_ = new();
@@ -17,6 +19,17 @@ namespace DouduckLib
         List<IUpdatable> IServiceLocator.UpdatableList => updatableList_;
         List<IFixedUpdatable> IServiceLocator.FixedUpdatableList => fixedUpdatableList_;
         List<ILateUpdatable> IServiceLocator.LateUpdatableList => lateUpdatableList_;
+
+        protected override void OnSingletonAwake()
+        {
+            foreach (var preloadService in preloadServices)
+            {
+                if (!this.HasService(preloadService.GetType()))
+                {
+                    this.AddService(preloadService);
+                }
+            }
+        }
 
         void Update()
         {

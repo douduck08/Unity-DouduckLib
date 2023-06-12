@@ -13,6 +13,7 @@ namespace DouduckLib
 
         protected void Awake()
         {
+            OnSingletonAwakeInternal();
             OnSingletonAwake();
         }
 
@@ -24,6 +25,7 @@ namespace DouduckLib
             }
             else
             {
+                OnSingletonDestroyInternal();
                 OnSingletonDestroy();
             }
         }
@@ -33,6 +35,8 @@ namespace DouduckLib
             applicationIsQuitting_ = true;
         }
 
+        protected abstract void OnSingletonAwakeInternal();
+        protected abstract void OnSingletonDestroyInternal();
         protected virtual void OnSingletonAwake() { }
         protected virtual void OnSingletonDestroy() { }
 
