@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace DouduckLib
 {
@@ -48,12 +49,21 @@ namespace DouduckLib
             {
                 dontDestroyOnLoad_ = true;
                 DontDestroyOnLoad(gameObject);
-                Debug.Log("[Singleton] An instance of " + typeof(T) + " was created as DontDestroyOnLoad.");
+                Debug.Log("[Singleton] An instance of " + typeof(T) + " was created as DontDestroyOnLoad.", instance);
             }
             else
             {
                 dontDestroyOnLoad_ = false;
-                Debug.Log("[Singleton] An instance of " + typeof(T) + " was created.");
+                Debug.Log("[Singleton] An instance of " + typeof(T) + " was created.", instance);
+            }
+            return instance;
+        }
+
+        protected static T MoveToScene<T>(T instance, Scene scene) where T : SingletonComponentBase
+        {
+            if (instance.gameObject.scene.handle != scene.handle)
+            {
+                SceneManager.MoveGameObjectToScene(instance.gameObject, scene);
             }
             return instance;
         }

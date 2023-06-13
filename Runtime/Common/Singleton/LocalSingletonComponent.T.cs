@@ -9,6 +9,7 @@ namespace DouduckLib
     {
         private static readonly Dictionary<int, T> loacalInstance_ = new();
         private static readonly object lock_ = new();
+        private static bool autoCreating = false;
 
         public static T Get(GameObject gameObject)
         {
@@ -21,9 +22,9 @@ namespace DouduckLib
                 var sceneHandle = gameObject.scene.handle;
                 if (!loacalInstance_.ContainsKey(sceneHandle))
                 {
-                    var instance = CreateInstance<T>(false);
-                    SceneManager.MoveGameObjectToScene(instance.gameObject, gameObject.scene);
-                    loacalInstance_.Add(sceneHandle, instance);
+                    autoCreating = true;
+                    loacalInstance_.Add(sceneHandle, MoveToScene(CreateInstance<T>(false), gameObject.scene));
+                    autoCreating = false;
                 }
                 return loacalInstance_[sceneHandle];
             }
@@ -40,14 +41,14 @@ namespace DouduckLib
 
         protected sealed override void OnSingletonAwakeInternal()
         {
+            if (autoCreating)
+            {
+                return;
+            }
             var sceneHandle = gameObject.scene.handle;
             if (!loacalInstance_.ContainsKey(sceneHandle))
             {
-                lock (lock_)
-                {
-                    var newInstance = CreateInstance<T>(false);
-                    loacalInstance_.Add(sceneHandle, newInstance);
-                }
+                loacalInstance_.Add(sceneHandle, this as T);
             }
             else if (loacalInstance_[sceneHandle] != this)
             {

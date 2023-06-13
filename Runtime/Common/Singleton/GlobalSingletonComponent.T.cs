@@ -8,6 +8,7 @@ namespace DouduckLib
     {
         private static T instance_;
         private static readonly object lock_ = new();
+        private static bool autoCreating = false;
 
         public static T Get()
         {
@@ -19,7 +20,9 @@ namespace DouduckLib
             {
                 if (instance_ == null)
                 {
+                    autoCreating = true;
                     instance_ = CreateInstance<T>(true);
+                    autoCreating = false;
                 }
                 return instance_;
             }
@@ -27,13 +30,14 @@ namespace DouduckLib
 
         protected sealed override void OnSingletonAwakeInternal()
         {
+            if (autoCreating)
+            {
+                return;
+            }
             if (instance_ == null)
             {
-                lock (lock_)
-                {
-                    instance_ = this as T;
-                    DontDestroyOnLoad(gameObject);
-                }
+                instance_ = this as T;
+                DontDestroyOnLoad(gameObject);
             }
             else if (instance_ != this)
             {
