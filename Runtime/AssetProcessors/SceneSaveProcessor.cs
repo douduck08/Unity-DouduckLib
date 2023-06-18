@@ -1,8 +1,10 @@
 ﻿using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.SceneManagement;
 #endif
 
 namespace DouduckLib
@@ -13,23 +15,23 @@ namespace DouduckLib
     }
 
 #if UNITY_EDITOR
-    public class SceneSaveProcessor : AssetPostprocessor
+    [InitializeOnLoad]
+    static class SceneSaveProcessor
     {
-        static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+        static SceneSaveProcessor()
         {
-            foreach (string path in importedAssets)
+            EditorSceneManager.sceneSaving += OnSceneSaving;
+        }
+
+        static void OnSceneSaving(Scene scene, string path)
+        {
+            foreach (Transform trans in UnityUtil.GetAllTransforms())
             {
-                if (Path.GetExtension(path).Equals(".unity"))
-                {
-                    foreach (Transform trans in UnityUtil.GetAllTransforms())
-                    {
-                        OnSceneSaveProcessing(trans);
-                    }
-                }
+                OnSceneSaveProcessing(trans);
             }
         }
 
-        private static void OnSceneSaveProcessing(Transform trans)
+        static void OnSceneSaveProcessing(Transform trans)
         {
             Component[] components = trans.GetComponents<Component>();
             foreach (Component component in components)
