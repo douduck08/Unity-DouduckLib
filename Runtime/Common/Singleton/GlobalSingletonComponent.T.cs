@@ -9,10 +9,11 @@ namespace DouduckLib
         private static T instance_;
         private static readonly object lock_ = new();
         private static bool autoCreating = false;
+        private static bool applicationIsQuitting_ = false;
 
         public static T Get()
         {
-            if (applicationIsQuitting)
+            if (applicationIsQuitting_)
             {
                 return null;
             }
@@ -38,6 +39,7 @@ namespace DouduckLib
             {
                 instance_ = this as T;
                 DontDestroyOnLoad(gameObject);
+                Debug.Log("[Singleton] An instance of " + typeof(T) + " has became singleton as DontDestroyOnLoad.", this);
             }
             else if (instance_ != this)
             {
@@ -47,6 +49,7 @@ namespace DouduckLib
 
         protected sealed override void OnSingletonDestroyInternal()
         {
+            applicationIsQuitting_ = true;
             instance_ = null;
         }
     }

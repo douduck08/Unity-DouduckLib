@@ -7,10 +7,6 @@ namespace DouduckLib
 {
     public abstract class SingletonComponentBase : MonoBehaviour
     {
-        protected static bool dontDestroyOnLoad => dontDestroyOnLoad_;
-        protected static bool applicationIsQuitting => applicationIsQuitting_;
-        private static bool dontDestroyOnLoad_ = false;
-        private static bool applicationIsQuitting_ = false;
 
         protected void Awake()
         {
@@ -20,20 +16,8 @@ namespace DouduckLib
 
         protected void OnDestroy()
         {
-            if (dontDestroyOnLoad_)
-            {
-                applicationIsQuitting_ = true;
-            }
-            else
-            {
-                OnSingletonDestroyInternal();
-                OnSingletonDestroy();
-            }
-        }
-
-        protected void OnApplicationQuit()
-        {
-            applicationIsQuitting_ = true;
+            OnSingletonDestroyInternal();
+            OnSingletonDestroy();
         }
 
         protected abstract void OnSingletonAwakeInternal();
@@ -47,13 +31,11 @@ namespace DouduckLib
             var instance = gameObject.AddComponent<T>();
             if (scrossScene)
             {
-                dontDestroyOnLoad_ = true;
                 DontDestroyOnLoad(gameObject);
                 Debug.Log("[Singleton] An instance of " + typeof(T) + " was created as DontDestroyOnLoad.", instance);
             }
             else
             {
-                dontDestroyOnLoad_ = false;
                 Debug.Log("[Singleton] An instance of " + typeof(T) + " was created.", instance);
             }
             return instance;

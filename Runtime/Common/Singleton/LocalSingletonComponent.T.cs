@@ -10,10 +10,11 @@ namespace DouduckLib
         private static readonly Dictionary<int, T> loacalInstance_ = new();
         private static readonly object lock_ = new();
         private static bool autoCreating = false;
+        private static bool applicationIsQuitting_ = false;
 
         public static T Get(GameObject gameObject)
         {
-            if (applicationIsQuitting)
+            if (applicationIsQuitting_)
             {
                 return null;
             }
@@ -49,6 +50,7 @@ namespace DouduckLib
             if (!loacalInstance_.ContainsKey(sceneHandle))
             {
                 loacalInstance_.Add(sceneHandle, this as T);
+                Debug.Log("[Singleton] An instance of " + typeof(T) + " has became singleton.", this);
             }
             else if (loacalInstance_[sceneHandle] != this)
             {
@@ -60,6 +62,11 @@ namespace DouduckLib
         {
             var sceneHandle = gameObject.scene.handle;
             loacalInstance_.Remove(sceneHandle);
+        }
+
+        protected void OnApplicationQuit()
+        {
+            applicationIsQuitting_ = true;
         }
     }
 }
