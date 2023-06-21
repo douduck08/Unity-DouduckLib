@@ -95,5 +95,15 @@ namespace DouduckLib
         {
             return GameObject.FindObjectsOfType<Transform>().Select(x => x.gameObject);
         }
+
+        public static bool IsPrefab(GameObject gameObject)
+        {
+            return gameObject.scene.name == null;
+        }
+
+        public static bool IsPrefab(Component component)
+        {
+            return component.gameObject.scene.name == null;
+        }
     }
 }
