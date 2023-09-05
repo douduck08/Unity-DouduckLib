@@ -5,89 +5,29 @@ using UnityEngine;
 
 namespace DouduckLib
 {
-    public interface IPooledComponent<TInitParam, TSpawnParam>
+    public class GameObjectPool<TObject, TData> : ObjectPoolBase<TObject, TData> where TObject : Component
     {
-        void OnCreateFromPool(TInitParam initParam);
-        void OnSpawnFromPool(TSpawnParam spawnParam);
-        void OnReturnToPool();
-    }
+        [SerializeField] Transform instantiatePatent;
 
-    public class GameObjectPool<TObject, TInitParam, TSpawnParam> where TObject : Component, IPooledComponent<TInitParam, TSpawnParam>
-    {
-
-        public TObject prefab;
-        public int initialSize;
-        public Transform instantiatePatent;
-        public TInitParam initialParam;
-
-        Stack<TObject> inactiveObjects;
-        HashSet<TObject> activeObjects;
-
-        public int activeCount
+        public ObjectPoolBase<TObject, TData> InitializePool(TObject prefab, Transform instantiatePatent, int initialSize)
         {
-            get
-            {
-                return activeObjects.Count;
-            }
-        }
-        public int inactiveCount
-        {
-            get
-            {
-                return inactiveObjects.Count;
-            }
-        }
-        public int totalCount
-        {
-            get
-            {
-                return activeCount + inactiveCount;
-            }
+            this.instantiatePatent = instantiatePatent;
+            return InitializePool(prefab, initialSize);
         }
 
-        public void InitializePool()
+        protected override TObject InstantiateObject(TObject prefab)
         {
-            inactiveObjects = new Stack<TObject>(initialSize);
-            activeObjects = new HashSet<TObject>();
-            for (int i = 0; i < initialSize; i++)
-            {
-                inactiveObjects.Push(AllocNew(false));
-            }
+            return GameObject.Instantiate<TObject>(prefab, instantiatePatent);
         }
 
-        TObject AllocNew(bool active)
+        protected override void ReleaseObject(TObject item)
         {
-            var item = GameObject.Instantiate<TObject>(prefab, instantiatePatent);
-            item.OnCreateFromPool(initialParam);
+            GameObject.Destroy(item.gameObject);
+        }
+
+        protected override void SetObjectActive(TObject item, bool active)
+        {
             item.gameObject.SetActive(active);
-            return item;
-        }
-
-        public TObject Spawn(TSpawnParam spawnParam)
-        {
-            if (inactiveObjects.Count == 0)
-            {
-                var item = AllocNew(true);
-                item.OnSpawnFromPool(spawnParam);
-                activeObjects.Add(item);
-                return item;
-            }
-            else
-            {
-                var item = inactiveObjects.Pop();
-                item.gameObject.SetActive(true);
-                item.OnSpawnFromPool(spawnParam);
-                activeObjects.Add(item);
-                return item;
-            }
-        }
-
-        public void Despawn(TObject item)
-        {
-            item.gameObject.SetActive(false);
-            item.OnReturnToPool();
-            activeObjects.Remove(item);
-            inactiveObjects.Push(item);
         }
     }
 }
