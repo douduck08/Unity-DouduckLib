@@ -6,7 +6,7 @@ using UnityEditor;
 namespace DouduckLibEditor
 {
     [InitializeOnLoad]
-    public class CameraAlignTool
+    public static class CameraAlignTool
     {
 
         static CameraAlignTool()

@@ -5,13 +5,13 @@ using UnityEditor;
 
 namespace DouduckLibEditor
 {
-    public class CaptureScreenshotTool
+    public static class CaptureScreenshotTool
     {
 
         readonly static string screenshotFilePath = "../Screenshot";
 
-        [MenuItem("Edit/CaptureScreenshot %k")]
-        public static void CaptureScreenshot()
+        [MenuItem("Edit/Capture Screenshot %k")]
+        static void CaptureScreenshot()
         {
             string path = Path.Combine(Application.dataPath, screenshotFilePath);
             if (!Directory.Exists(path))
