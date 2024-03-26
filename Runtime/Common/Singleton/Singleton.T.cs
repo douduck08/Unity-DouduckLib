@@ -2,15 +2,15 @@
 {
     public abstract class Singleton<T> where T : class, new()
     {
-        private static readonly object lock_ = new();
-        private static T instance_ = null;
+        private static readonly object _lock = new();
+        private static T _instance = null;
 
         public static T Get()
         {
-            lock (lock_)
+            lock (_lock)
             {
-                instance_ ??= new T();
-                return instance_;
+                _instance ??= new T();
+                return _instance;
             }
         }
     }

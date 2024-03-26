@@ -9,16 +9,16 @@ namespace DouduckLib
     {
         [SerializeField] List<Component> preloadServices = new();
 
-        private readonly Dictionary<Type, object> serviceDictionary_ = new();
-        private readonly List<IUpdatable> updatableList_ = new();
-        private readonly List<IFixedUpdatable> fixedUpdatableList_ = new();
-        private readonly List<ILateUpdatable> lateUpdatableList_ = new();
+        private readonly Dictionary<Type, object> _serviceDictionary = new();
+        private readonly List<IUpdatable> _updatableList = new();
+        private readonly List<IFixedUpdatable> _fixedUpdatableList = new();
+        private readonly List<ILateUpdatable> _lateUpdatableList = new();
 
         GameObject IServiceLocator.Owner => gameObject;
-        Dictionary<Type, object> IServiceLocator.ServiceDictionary => serviceDictionary_;
-        List<IUpdatable> IServiceLocator.UpdatableList => updatableList_;
-        List<IFixedUpdatable> IServiceLocator.FixedUpdatableList => fixedUpdatableList_;
-        List<ILateUpdatable> IServiceLocator.LateUpdatableList => lateUpdatableList_;
+        Dictionary<Type, object> IServiceLocator.ServiceDictionary => _serviceDictionary;
+        List<IUpdatable> IServiceLocator.UpdatableList => _updatableList;
+        List<IFixedUpdatable> IServiceLocator.FixedUpdatableList => _fixedUpdatableList;
+        List<ILateUpdatable> IServiceLocator.LateUpdatableList => _lateUpdatableList;
 
         protected override void OnSingletonAwake()
         {
@@ -33,25 +33,25 @@ namespace DouduckLib
 
         void Update()
         {
-            for (int i = updatableList_.Count - 1; i >= 0; i--)
+            for (int i = _updatableList.Count - 1; i >= 0; i--)
             {
-                updatableList_[i].OnUpdate();
+                _updatableList[i].OnUpdate();
             }
         }
 
         void FixedUpdate()
         {
-            for (int i = fixedUpdatableList_.Count - 1; i >= 0; i--)
+            for (int i = _fixedUpdatableList.Count - 1; i >= 0; i--)
             {
-                fixedUpdatableList_[i].OnFixedUpdate();
+                _fixedUpdatableList[i].OnFixedUpdate();
             }
         }
 
         void LateUpdate()
         {
-            for (int i = lateUpdatableList_.Count - 1; i >= 0; i--)
+            for (int i = _lateUpdatableList.Count - 1; i >= 0; i--)
             {
-                lateUpdatableList_[i].OnLateUpdate();
+                _lateUpdatableList[i].OnLateUpdate();
             }
         }
     }

@@ -6,42 +6,42 @@ namespace DouduckLib
 {
     public abstract class GlobalSingletonComponent<T> : SingletonComponentBase where T : SingletonComponentBase
     {
-        private static T instance_;
-        private static readonly object lock_ = new();
-        private static bool autoCreating = false;
-        private static bool applicationIsQuitting_ = false;
+        private static T _instance;
+        private static readonly object _lock = new();
+        private static bool _autoCreating = false;
+        private static bool _applicationIsQuitting = false;
 
         public static T Get()
         {
-            if (applicationIsQuitting_)
+            if (_applicationIsQuitting)
             {
                 return null;
             }
-            lock (lock_)
+            lock (_lock)
             {
-                if (instance_ == null)
+                if (_instance == null)
                 {
-                    autoCreating = true;
-                    instance_ = CreateInstance<T>(true);
-                    autoCreating = false;
+                    _autoCreating = true;
+                    _instance = CreateInstance<T>(true);
+                    _autoCreating = false;
                 }
-                return instance_;
+                return _instance;
             }
         }
 
         protected sealed override void OnSingletonAwakeInternal()
         {
-            if (autoCreating)
+            if (_autoCreating)
             {
                 return;
             }
-            if (instance_ == null)
+            if (_instance == null)
             {
-                instance_ = this as T;
+                _instance = this as T;
                 DontDestroyOnLoad(gameObject);
                 Debug.Log("[Singleton] An instance of " + typeof(T) + " has became singleton as DontDestroyOnLoad.", this);
             }
-            else if (instance_ != this)
+            else if (_instance != this)
             {
                 throw new System.InvalidOperationException("[Singleton] There should never be more than 1 singleton instance of " + typeof(T));
             }
@@ -49,8 +49,8 @@ namespace DouduckLib
 
         protected sealed override void OnSingletonDestroyInternal()
         {
-            applicationIsQuitting_ = true;
-            instance_ = null;
+            _applicationIsQuitting = true;
+            _instance = null;
         }
     }
 }
