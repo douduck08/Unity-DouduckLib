@@ -195,7 +195,11 @@ namespace DouduckLib
             {
                 if (unloadList[i] > -1)
                 {
-                    unloadOps.Add(SceneManager.UnloadSceneAsync(unloadList[i]));
+                    var scene = SceneManager.GetSceneByBuildIndex(unloadList[i]);
+                    if (scene.isLoaded)
+                    {
+                        unloadOps.Add(SceneManager.UnloadSceneAsync(unloadList[i]));
+                    }
                 }
             }
 
