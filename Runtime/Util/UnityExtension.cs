@@ -5,12 +5,11 @@ namespace DouduckLib
 {
     public static class UnityExtension
     {
-        public static T GetOrAddComponent<T>(this Component trans) where T : Component
+        public static T GetOrAddComponent<T>(this Component component) where T : Component
         {
-            T result = trans.GetComponent<T>();
-            if (result == null)
+            if (!component.TryGetComponent<T>(out var result))
             {
-                result = trans.gameObject.AddComponent<T>();
+                result = component.gameObject.AddComponent<T>();
             }
             return result;
         }
