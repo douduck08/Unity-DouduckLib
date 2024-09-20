@@ -9,15 +9,23 @@ namespace DouduckLibEditor.UI
     {
         const string uiMenuItemPath = "GameObject/UI/Others/";
 
-        [MenuItem(uiMenuItemPath + "Empty Graphic")]
-        static void CreateEmptyGraphic(MenuCommand command)
+        static void CreateObjectWithComponent<T>(MenuCommand menuCommand, string name) where T : Component
         {
-            var go = new GameObject("EmptyGraphic");
-            go.AddComponent<EmptyGraphic>();
-            GameObjectUtility.SetParentAndAlign(go, command.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(go, "Create" + go.name);
+            var go = new GameObject(name);
+            go.AddComponent<T>();
+            GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
             Selection.activeObject = go;
         }
+
+        [MenuItem(uiMenuItemPath + "Empty Graphic")]
+        static void CreateEmptyGraphic(MenuCommand menuCommand) => CreateObjectWithComponent<EmptyGraphic>(menuCommand, "EmptyGraphic");
+
+        [MenuItem(uiMenuItemPath + "Vertical Group")]
+        static void CreateVerticalGroup(MenuCommand menuCommand) => CreateObjectWithComponent<VerticalLayoutGroup>(menuCommand, "VerticalGroup");
+
+        [MenuItem(uiMenuItemPath + "Horizontal Group")]
+        static void CreateHorizontalGroup(MenuCommand menuCommand) => CreateObjectWithComponent<HorizontalLayoutGroup>(menuCommand, "HorizontalGroup");
 
         [MenuItem(uiMenuItemPath + "Non-Raycast Image")]
         static void CreatImage(MenuCommand menuCommand)
