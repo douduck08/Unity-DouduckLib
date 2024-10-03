@@ -4,7 +4,9 @@ using UnityEngine;
 
 namespace DouduckLib
 {
-    public abstract class GlobalSingletonComponent<T> : SingletonComponentBase where T : SingletonComponentBase
+    public abstract class GlobalSingletonComponent<T> : GlobalSingletonComponent<T, SingletonOption.AutoCreate> where T : SingletonComponentBase { }
+
+    public abstract class GlobalSingletonComponent<T, S> : SingletonComponentBase where T : SingletonComponentBase where S : SingletonOption.IOptopn
     {
         private static T _instance;
         private static readonly object _lock = new();
@@ -19,7 +21,7 @@ namespace DouduckLib
             }
             lock (_lock)
             {
-                if (_instance == null)
+                if (_instance == null && typeof(S) == typeof(SingletonOption.AutoCreate))
                 {
                     _autoCreating = true;
                     _instance = CreateInstance<T>(true);

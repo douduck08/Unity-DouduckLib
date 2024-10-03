@@ -5,7 +5,9 @@ using UnityEngine.SceneManagement;
 
 namespace DouduckLib
 {
-    public abstract class LocalSingletonComponent<T> : SingletonComponentBase where T : SingletonComponentBase
+    public abstract class LocalSingletonComponent<T> : LocalSingletonComponent<T, SingletonOption.AutoCreate> where T : SingletonComponentBase { }
+
+    public abstract class LocalSingletonComponent<T, S> : SingletonComponentBase where T : SingletonComponentBase where S : SingletonOption.IOptopn
     {
         private static readonly Dictionary<int, T> _loacalInstance = new();
         private static readonly object _lock = new();
@@ -21,13 +23,17 @@ namespace DouduckLib
             lock (_lock)
             {
                 var sceneHandle = gameObject.scene.handle;
-                if (!_loacalInstance.ContainsKey(sceneHandle))
+                if (!_loacalInstance.ContainsKey(sceneHandle) && typeof(S) == typeof(SingletonOption.AutoCreate))
                 {
                     _autoCreating = true;
                     _loacalInstance.Add(sceneHandle, MoveToScene(CreateInstance<T>(false), gameObject.scene));
                     _autoCreating = false;
                 }
-                return _loacalInstance[sceneHandle];
+                if (_loacalInstance.ContainsKey(sceneHandle))
+                {
+                    return _loacalInstance[sceneHandle];
+                }
+                return null;
             }
         }
 
