@@ -21,9 +21,10 @@ namespace DouduckLib
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            bool enabledCache = GUI.enabled;
             GUI.enabled = false;
             EditorGUI.PropertyField(position, property, label, true);
-            GUI.enabled = true;
+            GUI.enabled = enabledCache;
         }
     }
 #endif

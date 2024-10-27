@@ -43,8 +43,8 @@ namespace DouduckLib
 
         protected void DrawButtons()
         {
-            var methods = this.target.GetType()
-                .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            var methods = target.GetType()
+                .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
                 .Where(m => m.GetParameters().Length == 0);
 
             foreach (var method in methods)
