@@ -29,10 +29,10 @@ namespace DouduckLibEditor
             return Selection.assetGUIDs.Length > 0;
         }
 
-        // [MenuItem("Assets/Reserialize All Assets")]
-        // static void ReserializeAllAssets()
-        // {
-        //     AssetDatabase.ForceReserializeAssets();
-        // }
+        [MenuItem(EditorUtil.MenuItemPathRoot + "Reserialize All Assets", false, 100)]
+        static void ReserializeAllAssets()
+        {
+            AssetDatabase.ForceReserializeAssets();
+        }
     }
 }
