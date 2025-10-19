@@ -8,18 +8,18 @@ using UnityEditor;
 namespace DouduckLib
 {
     [AttributeUsage(AttributeTargets.Field)]
-    public class ListItemTitleAttribute : PropertyAttribute
+    public class ListItemNameAttribute : PropertyAttribute
     {
         public string titleFieldName;
-        public ListItemTitleAttribute(string titleField)
+        public ListItemNameAttribute(string titleField)
         {
             titleFieldName = titleField;
         }
     }
 
 #if UNITY_EDITOR
-    [CustomPropertyDrawer(typeof(ListItemTitleAttribute))]
-    public class ListItemTitlePropertyDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(ListItemNameAttribute))]
+    public class ListItemNamePropertyDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -28,7 +28,7 @@ namespace DouduckLib
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            var titleAttribute = attribute as ListItemTitleAttribute;
+            var titleAttribute = attribute as ListItemNameAttribute;
             if (titleAttribute != null)
             {
                 var titleProperty = property.FindPropertyRelative(titleAttribute.titleFieldName);
