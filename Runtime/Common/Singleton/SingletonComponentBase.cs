@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,11 +25,11 @@ namespace DouduckLib
         protected virtual void OnSingletonAwake() { }
         protected virtual void OnSingletonDestroy() { }
 
-        protected static T CreateInstance<T>(bool scrossScene) where T : SingletonComponentBase
+        protected static T CreateInstance<T>(bool acrossScene) where T : SingletonComponentBase
         {
             var gameObject = new GameObject() { name = typeof(T).Name + " (Singleton)" };
             var instance = gameObject.AddComponent<T>();
-            if (scrossScene)
+            if (acrossScene)
             {
                 DontDestroyOnLoad(gameObject);
                 Debug.Log("[Singleton] An instance of " + typeof(T) + " was created as DontDestroyOnLoad.", instance);

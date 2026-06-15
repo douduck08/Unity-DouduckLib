@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -7,17 +7,17 @@ namespace DouduckLib
 {
     public class DIContainer
     {
-        readonly IDictionary<Type, Type> types = new Dictionary<Type, Type>();
-        readonly IDictionary<Type, object> typeInstances = new Dictionary<Type, object>();
+        readonly Dictionary<Type, Type> _types = new Dictionary<Type, Type>();
+        readonly Dictionary<Type, object> _typeInstances = new Dictionary<Type, object>();
 
         public void Register<TContract, TImplementation>()
         {
-            types[typeof(TContract)] = typeof(TImplementation);
+            _types[typeof(TContract)] = typeof(TImplementation);
         }
 
         public void Register<TContract, TImplementation>(TImplementation instance)
         {
-            typeInstances[typeof(TContract)] = instance;
+            _typeInstances[typeof(TContract)] = instance;
         }
 
         public T Resolve<T>()
@@ -27,13 +27,13 @@ namespace DouduckLib
 
         public object Resolve(Type contractType)
         {
-            if (typeInstances.ContainsKey(contractType))
+            if (_typeInstances.ContainsKey(contractType))
             {
-                return typeInstances[contractType];
+                return _typeInstances[contractType];
             }
             else
             {
-                Type implementation = types[contractType];
+                Type implementation = _types[contractType];
                 ConstructorInfo constructor = implementation.GetConstructors()[0];
                 ParameterInfo[] constructorParameters = constructor.GetParameters();
                 if (constructorParameters.Length == 0)

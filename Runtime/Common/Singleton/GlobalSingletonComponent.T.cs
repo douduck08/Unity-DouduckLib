@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,12 +6,12 @@ namespace DouduckLib
 {
     public abstract class GlobalSingletonComponent<T> : GlobalSingletonComponent<T, SingletonOption.AutoCreate> where T : SingletonComponentBase { }
 
-    public abstract class GlobalSingletonComponent<T, S> : SingletonComponentBase where T : SingletonComponentBase where S : SingletonOption.IOptopn
+    public abstract class GlobalSingletonComponent<T, S> : SingletonComponentBase where T : SingletonComponentBase where S : SingletonOption.IOption
     {
-        private static T _instance;
-        private static readonly object _lock = new();
-        private static bool _autoCreating = false;
-        private static bool _applicationIsQuitting = false;
+        static T _instance;
+        static readonly object _lock = new();
+        static bool _autoCreating = false;
+        static bool _applicationIsQuitting = false;
 
         public static T Get()
         {

@@ -6,9 +6,9 @@ namespace DouduckLib
 {
     public abstract class ComponentState : MonoBehaviour, IState
     {
-        public IStateController controller => _controller;
-        public bool isStarted => _isStarted;
-        public bool isCompleted => _isCompleted;
+        public IStateController Controller => _controller;
+        public bool IsStarted => _isStarted;
+        public bool IsCompleted => _isCompleted;
 
         IStateController _controller;
         bool _isStarted = false;
@@ -26,15 +26,15 @@ namespace DouduckLib
             if (!_isStarted)
             {
                 _isStarted = true;
-                OnStateEnter();
+                OnEnter();
             }
             if (!_isCompleted)
             {
-                OnStateUpdate();
+                OnUpdate();
             }
             if (_isCompleted)
             {
-                OnStateExit();
+                OnExit();
             }
         }
 
@@ -45,8 +45,8 @@ namespace DouduckLib
             _isCompleted = true;
         }
 
-        protected virtual void OnStateEnter() { }
-        protected virtual void OnStateUpdate() { }
-        protected virtual void OnStateExit() { }
+        protected virtual void OnEnter() { }
+        protected virtual void OnUpdate() { }
+        protected virtual void OnExit() { }
     }
 }

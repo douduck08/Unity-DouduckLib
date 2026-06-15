@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -7,7 +7,7 @@ namespace DouduckLib
     public sealed class StateController : IStateController
     {
         IState _currentState = null;
-        public IState currentState
+        public IState CurrentState
         {
             get
             {
@@ -32,11 +32,11 @@ namespace DouduckLib
 
         public void StateUpdate()
         {
-            var current = currentState;
+            var current = CurrentState;
             if (current != null)
             {
                 current.StateUpdate();
-                if (current.isCompleted)
+                if (current.IsCompleted)
                 {
                     SetState(current.GetNextState());
                 }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,12 +6,12 @@ namespace DouduckLib
 {
     public class Noise
     {
-        static int[] hash = { 151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196, 135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123, 5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9, 129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228, 251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180 };
-        static int hashMask = 255;
+        static int[] _hash = { 151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196, 135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123, 5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9, 129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228, 251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180 };
+        static int _hashMask = 255;
 
         static int Hash(float x)
         {
-            return hash[Mathf.FloorToInt(x) & hashMask];
+            return _hash[Mathf.FloorToInt(x) & _hashMask];
         }
 
         static int Hash(float x, float y)
@@ -34,7 +34,7 @@ namespace DouduckLib
             x *= scale;
             int h0 = Hash(x);
             int h1 = Hash(x + 1f);
-            return Mathf.Lerp(h0, h1, Smooth(x % 1f)) * (1f / hashMask);
+            return Mathf.Lerp(h0, h1, Smooth(x % 1f)) * (1f / _hashMask);
         }
 
         public static float Value2D(Vector2 point, float scale = 1f)
@@ -46,7 +46,7 @@ namespace DouduckLib
             int h11 = Hash(point.x + 1f, point.y + 1f);
             float hx0 = Mathf.Lerp(h00, h10, Smooth(point.x % 1f));
             float hx1 = Mathf.Lerp(h01, h11, Smooth(point.x % 1f));
-            return Mathf.Lerp(hx0, hx1, Smooth(point.y % 1f)) * (1f / hashMask);
+            return Mathf.Lerp(hx0, hx1, Smooth(point.y % 1f)) * (1f / _hashMask);
         }
 
         public static float Value3D(Vector3 point, float scale)
@@ -65,19 +65,18 @@ namespace DouduckLib
             float hx01 = Mathf.Lerp(h001, h101, Smooth(point.x % 1f));
             float hx11 = Mathf.Lerp(h011, h111, Smooth(point.x % 1f));
             float hxy0 = Mathf.Lerp(hx00, hx10, Smooth(point.y % 1f));
-            float hxy1 = Mathf.Lerp(hx01, hx11, Smooth(point.y % 1f));
-            return Mathf.Lerp(hxy0, hxy1, Smooth(point.z % 1f)) * (1f / hashMask);
-            ;
+            float hxy1 = Mathf.Lerp(hx01, hx11, Smooth(point.z % 1f));
+            return Mathf.Lerp(hxy0, hxy1, Smooth(point.z % 1f)) * (1f / _hashMask);
         }
 
-        static float[] gradients1D = { 1f, -1f };
-        static int gradientsMask1D = 1;
+        static float[] _gradients1D = { 1f, -1f };
+        static int _gradientsMask1D = 1;
 
         public static float Perlin1D(float x, float scale)
         {
             x *= scale;
-            float g0 = gradients1D[Hash(x) & gradientsMask1D];
-            float g1 = gradients1D[Hash(x + 1f) & gradientsMask1D];
+            float g0 = _gradients1D[Hash(x) & _gradientsMask1D];
+            float g1 = _gradients1D[Hash(x + 1f) & _gradientsMask1D];
 
             float t = x % 1f;
             float v0 = g0 * t;
@@ -86,7 +85,7 @@ namespace DouduckLib
             return Mathf.Lerp(v0, v1, Smooth(t)) * 0.5f + 0.5f;
         }
 
-        static Vector2[] gradients2D = {
+        static Vector2[] _gradients2D = {
             new Vector2 (1f, 0f),
             new Vector2 (-1f, 0f),
             new Vector2 (0f, 1f),
@@ -96,7 +95,7 @@ namespace DouduckLib
             new Vector2 (1f, -1f).normalized,
             new Vector2 (-1f, -1f).normalized
         };
-        static int gradientsMask2D = 7;
+        static int _gradientsMask2D = 7;
 
         static float Dot(Vector2 g, float x, float y)
         {
@@ -106,10 +105,10 @@ namespace DouduckLib
         public static float Perlin2D(Vector2 point, float scale)
         {
             point *= scale;
-            Vector2 g00 = gradients2D[Hash(point.x, point.y) & gradientsMask2D];
-            Vector2 g01 = gradients2D[Hash(point.x, point.y + 1f) & gradientsMask2D];
-            Vector2 g10 = gradients2D[Hash(point.x + 1f, point.y) & gradientsMask2D];
-            Vector2 g11 = gradients2D[Hash(point.x + 1f, point.y + 1f) & gradientsMask2D];
+            Vector2 g00 = _gradients2D[Hash(point.x, point.y) & _gradientsMask2D];
+            Vector2 g01 = _gradients2D[Hash(point.x, point.y + 1f) & _gradientsMask2D];
+            Vector2 g10 = _gradients2D[Hash(point.x + 1f, point.y) & _gradientsMask2D];
+            Vector2 g11 = _gradients2D[Hash(point.x + 1f, point.y + 1f) & _gradientsMask2D];
 
             float tx = point.x % 1f;
             float ty = point.y % 1f;
@@ -123,7 +122,7 @@ namespace DouduckLib
             return Mathf.Lerp(vx0, vx1, Smooth(ty)) * MathUtil.sqrt2 * 0.5f + 0.5f;
         }
 
-        static Vector3[] gradients3D = {
+        static Vector3[] _gradients3D = {
             new Vector3 (1f, 1f, 0f),
             new Vector3 (-1f, 1f, 0f),
             new Vector3 (1f, -1f, 0f),
@@ -141,7 +140,7 @@ namespace DouduckLib
             new Vector3 (0f, -1f, 1f),
             new Vector3 (0f, -1f, -1f)
         };
-        static int gradientsMask3D = 15;
+        static int _gradientsMask3D = 15;
 
         static float Dot(Vector3 g, float x, float y, float z)
         {
@@ -151,14 +150,14 @@ namespace DouduckLib
         public static float Perlin3D(Vector3 point, float scale)
         {
             point *= scale;
-            Vector3 g000 = gradients3D[Hash(point.x, point.y, point.z) & gradientsMask3D];
-            Vector3 g010 = gradients3D[Hash(point.x, point.y, point.z) & gradientsMask3D];
-            Vector3 g100 = gradients3D[Hash(point.x, point.y, point.z) & gradientsMask3D];
-            Vector3 g110 = gradients3D[Hash(point.x, point.y, point.z) & gradientsMask3D];
-            Vector3 g001 = gradients3D[Hash(point.x, point.y, point.z) & gradientsMask3D];
-            Vector3 g011 = gradients3D[Hash(point.x, point.y, point.z) & gradientsMask3D];
-            Vector3 g101 = gradients3D[Hash(point.x, point.y, point.z) & gradientsMask3D];
-            Vector3 g111 = gradients3D[Hash(point.x, point.y, point.z) & gradientsMask3D];
+            Vector3 g000 = _gradients3D[Hash(point.x, point.y, point.z) & _gradientsMask3D];
+            Vector3 g010 = _gradients3D[Hash(point.x, point.y, point.z) & _gradientsMask3D];
+            Vector3 g100 = _gradients3D[Hash(point.x, point.y, point.z) & _gradientsMask3D];
+            Vector3 g110 = _gradients3D[Hash(point.x, point.y, point.z) & _gradientsMask3D];
+            Vector3 g001 = _gradients3D[Hash(point.x, point.y, point.z) & _gradientsMask3D];
+            Vector3 g011 = _gradients3D[Hash(point.x, point.y, point.z) & _gradientsMask3D];
+            Vector3 g101 = _gradients3D[Hash(point.x, point.y, point.z) & _gradientsMask3D];
+            Vector3 g111 = _gradients3D[Hash(point.x, point.y, point.z) & _gradientsMask3D];
 
             float tx = point.x % 1f;
             float ty = point.y % 1f;

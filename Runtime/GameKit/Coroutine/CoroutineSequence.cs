@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,17 +11,17 @@ namespace DouduckLib
         class InsertedEnumerator
         {
             public IEnumerator InternalEnumerator { get; private set; }
-            float atPosition;
+            float _atPosition;
 
             public InsertedEnumerator(float atPosition, IEnumerator enumerator)
             {
-                this.atPosition = atPosition;
+                _atPosition = atPosition;
                 InternalEnumerator = enumerator;
             }
 
             public IEnumerator GetEnumerator()
             {
-                var waitTime = Time.time + atPosition;
+                var waitTime = Time.time + _atPosition;
                 while (Time.time < waitTime)
                 {
                     yield return null;
@@ -34,7 +34,7 @@ namespace DouduckLib
         class AppendedEnumerator
         {
             public IEnumerator InternalEnumerator { get; private set; }
-            List<IEnumerator> jointEnumerators = new List<IEnumerator>();
+            List<IEnumerator> _jointEnumerators = new List<IEnumerator>();
 
             public AppendedEnumerator(IEnumerator enumerator)
             {
@@ -48,133 +48,132 @@ namespace DouduckLib
 
             public void AddJointEnumerator(IEnumerator enumerator)
             {
-                jointEnumerators.Add(enumerator);
+                _jointEnumerators.Add(enumerator);
             }
 
             public void StartJointCoroutine(MonoBehaviour owner, List<Coroutine> coroutines)
             {
-                for (int i = 0; i < jointEnumerators.Count; i++)
+                for (int i = 0; i < _jointEnumerators.Count; i++)
                 {
-                    coroutines.Add(owner.StartCoroutine(jointEnumerators[i]));
+                    coroutines.Add(owner.StartCoroutine(_jointEnumerators[i]));
                 }
             }
         }
 
-        List<Coroutine> coroutines = new List<Coroutine>();
-        List<InsertedEnumerator> insertedEnumerators = new List<InsertedEnumerator>();
-        List<AppendedEnumerator> appendedEnumerators = new List<AppendedEnumerator>();
-        List<CoroutineSequence> sequences = new List<CoroutineSequence>();
+        List<Coroutine> _coroutines = new List<Coroutine>();
+        List<InsertedEnumerator> _insertedEnumerators = new List<InsertedEnumerator>();
+        List<AppendedEnumerator> _appendedEnumerators = new List<AppendedEnumerator>();
+        List<CoroutineSequence> _sequences = new List<CoroutineSequence>();
 
-        MonoBehaviour owner;
-        Action onComplete;
+        MonoBehaviour _owner;
+        Action _onComplete;
 
         public CoroutineSequence(MonoBehaviour owner)
         {
-            this.owner = owner;
+            _owner = owner;
         }
 
         public CoroutineSequence Insert(float atPosition, IEnumerator enumerator)
         {
-            insertedEnumerators.Add(new InsertedEnumerator(atPosition, enumerator));
+            _insertedEnumerators.Add(new InsertedEnumerator(atPosition, enumerator));
             return this;
         }
 
         public CoroutineSequence Insert(float atPosition, Action callback)
         {
-            insertedEnumerators.Add(new InsertedEnumerator(atPosition, GetCallbackEnumerator(callback)));
+            _insertedEnumerators.Add(new InsertedEnumerator(atPosition, GetCallbackEnumerator(callback)));
             return this;
         }
 
         public CoroutineSequence Insert(float atPosition, CoroutineSequence coroutineSequence)
         {
-            insertedEnumerators.Add(new InsertedEnumerator(atPosition, coroutineSequence.GetEnumerator()));
-            sequences.Add(coroutineSequence);
+            _insertedEnumerators.Add(new InsertedEnumerator(atPosition, coroutineSequence.GetEnumerator()));
+            _sequences.Add(coroutineSequence);
             return this;
         }
 
         public CoroutineSequence Append(IEnumerator enumerator)
         {
-            appendedEnumerators.Add(new AppendedEnumerator(enumerator));
+            _appendedEnumerators.Add(new AppendedEnumerator(enumerator));
             return this;
         }
 
         public CoroutineSequence Append(Action callback)
         {
-            appendedEnumerators.Add(new AppendedEnumerator(GetCallbackEnumerator(callback)));
+            _appendedEnumerators.Add(new AppendedEnumerator(GetCallbackEnumerator(callback)));
             return this;
         }
 
         public CoroutineSequence Append(CoroutineSequence coroutineSequence)
         {
-            appendedEnumerators.Add(new AppendedEnumerator(coroutineSequence.GetEnumerator()));
-            sequences.Add(coroutineSequence);
+            _appendedEnumerators.Add(new AppendedEnumerator(coroutineSequence.GetEnumerator()));
+            _sequences.Add(coroutineSequence);
             return this;
         }
 
         public CoroutineSequence AppendInterval(float seconds)
         {
-            appendedEnumerators.Add(new AppendedEnumerator(GetWaitForSecondsEnumerator(seconds)));
+            _appendedEnumerators.Add(new AppendedEnumerator(GetWaitForSecondsEnumerator(seconds)));
             return this;
         }
 
         public CoroutineSequence Joint(IEnumerator enumerator)
         {
-            var index = appendedEnumerators.Count - 1;
-            appendedEnumerators[index].AddJointEnumerator(enumerator);
+            var index = _appendedEnumerators.Count - 1;
+            _appendedEnumerators[index].AddJointEnumerator(enumerator);
             return this;
         }
 
         public CoroutineSequence Joint(Action callback)
         {
-            var index = appendedEnumerators.Count - 1;
-            appendedEnumerators[index].AddJointEnumerator(GetCallbackEnumerator(callback));
+            var index = _appendedEnumerators.Count - 1;
+            _appendedEnumerators[index].AddJointEnumerator(GetCallbackEnumerator(callback));
             return this;
         }
 
         public CoroutineSequence Joint(CoroutineSequence coroutineSequence)
         {
-            var index = appendedEnumerators.Count - 1;
-            appendedEnumerators[index].AddJointEnumerator(coroutineSequence.GetEnumerator());
-            sequences.Add(coroutineSequence);
+            var index = _appendedEnumerators.Count - 1;
+            _appendedEnumerators[index].AddJointEnumerator(coroutineSequence.GetEnumerator());
+            _sequences.Add(coroutineSequence);
             return this;
         }
 
         public CoroutineSequence OnComplete(Action callback)
         {
-            onComplete += callback;
+            _onComplete += callback;
             return this;
-
         }
 
         public Coroutine StartCoroutine()
         {
-            var coroutine = owner.StartCoroutine(GetEnumerator());
-            coroutines.Add(coroutine);
+            var coroutine = _owner.StartCoroutine(GetEnumerator());
+            _coroutines.Add(coroutine);
             return coroutine;
         }
 
         public void StopCoroutine()
         {
-            for (int i = 0; i < coroutines.Count; i++)
+            for (int i = 0; i < _coroutines.Count; i++)
             {
-                owner.StopCoroutine(coroutines[i]);
+                _owner.StopCoroutine(_coroutines[i]);
             }
-            for (int i = 0; i < insertedEnumerators.Count; i++)
+            for (int i = 0; i < _insertedEnumerators.Count; i++)
             {
-                owner.StopCoroutine(insertedEnumerators[i].InternalEnumerator);
+                _owner.StopCoroutine(_insertedEnumerators[i].InternalEnumerator);
             }
-            for (int i = 0; i < appendedEnumerators.Count; i++)
+            for (int i = 0; i < _appendedEnumerators.Count; i++)
             {
-                owner.StopCoroutine(appendedEnumerators[i].InternalEnumerator);
+                _owner.StopCoroutine(_appendedEnumerators[i].InternalEnumerator);
             }
-            for (int i = 0; i < sequences.Count; i++)
+            for (int i = 0; i < _sequences.Count; i++)
             {
-                sequences[i].StopCoroutine();
+                _sequences[i].StopCoroutine();
             }
-            coroutines.Clear();
-            insertedEnumerators.Clear();
-            appendedEnumerators.Clear();
-            sequences.Clear();
+            _coroutines.Clear();
+            _insertedEnumerators.Clear();
+            _appendedEnumerators.Clear();
+            _sequences.Clear();
         }
 
         IEnumerator GetCallbackEnumerator(Action callback)
@@ -190,21 +189,21 @@ namespace DouduckLib
 
         IEnumerator GetEnumerator()
         {
-            for (int i = 0; i < insertedEnumerators.Count; i++)
+            for (int i = 0; i < _insertedEnumerators.Count; i++)
             {
-                var coroutine = owner.StartCoroutine(insertedEnumerators[i].GetEnumerator());
-                coroutines.Add(coroutine);
+                var coroutine = _owner.StartCoroutine(_insertedEnumerators[i].GetEnumerator());
+                _coroutines.Add(coroutine);
             }
 
-            for (int i = 0; i < appendedEnumerators.Count; i++)
+            for (int i = 0; i < _appendedEnumerators.Count; i++)
             {
-                appendedEnumerators[i].StartJointCoroutine(owner, coroutines);
-                yield return appendedEnumerators[i].GetEnumerator();
+                _appendedEnumerators[i].StartJointCoroutine(_owner, _coroutines);
+                yield return _appendedEnumerators[i].GetEnumerator();
             }
 
-            if (onComplete != null)
+            if (_onComplete != null)
             {
-                onComplete.Invoke();
+                _onComplete.Invoke();
             }
         }
     }

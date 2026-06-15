@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -68,7 +68,7 @@ namespace DouduckLib
 
         public int GetIndex(string value)
         {
-            for (int i = 0; i < intValues.Length; i++)
+            for (int i = 0; i < stringValues.Length; i++)
             {
                 if (stringValues[i] == value)
                     return i;

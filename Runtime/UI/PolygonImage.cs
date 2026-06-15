@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,32 +12,32 @@ namespace DouduckLib.UI
         protected PolygonImage() { }
 
         // GC Friendly
-        private static Vector3[] fourCorners = new Vector3[4];
-        private static UIVertex vertice = new UIVertex();
+        static Vector3[] _fourCorners = new Vector3[4];
+        static UIVertex _vertice = new UIVertex();
 
-        private RectTransform rectTransform = null;
-        private Image image = null;
-        private Vector2[] spriteVertices;
-        private ushort[] spriteTriangles;
+        RectTransform _rectTransform = null;
+        Image _image = null;
+        Vector2[] _spriteVertices;
+        ushort[] _spriteTriangles;
 
         public override void ModifyMesh(VertexHelper vh)
         {
             if (!isActiveAndEnabled)
                 return;
 
-            if (rectTransform == null)
+            if (_rectTransform == null)
             {
-                rectTransform = GetComponent<RectTransform>();
+                _rectTransform = GetComponent<RectTransform>();
             }
-            if (image == null)
+            if (_image == null)
             {
-                image = GetComponent<Image>();
+                _image = GetComponent<Image>();
             }
-            if (image.type != Image.Type.Simple)
+            if (_image.type != Image.Type.Simple)
             {
                 return;
             }
-            Sprite sprite = image.overrideSprite;
+            Sprite sprite = _image.overrideSprite;
             if (sprite == null || sprite.triangles.Length == 6)
             {
                 // only 2 triangles
@@ -51,11 +51,11 @@ namespace DouduckLib.UI
                 return;
             }
 
-            rectTransform.GetLocalCorners(fourCorners);
+            _rectTransform.GetLocalCorners(_fourCorners);
 
             // Kanglai: recalculate vertices from Sprite!
-            spriteVertices = sprite.vertices;
-            int len = spriteVertices.Length;
+            _spriteVertices = sprite.vertices;
+            int len = _spriteVertices.Length;
             var vertices = new List<UIVertex>(len);
             Vector2 Center = sprite.bounds.center;
             Vector2 invExtend = new Vector2(1 / sprite.bounds.size.x, 1 / sprite.bounds.size.y);
@@ -65,16 +65,16 @@ namespace DouduckLib.UI
                 float x = (sprite.vertices[i].x - Center.x) * invExtend.x + 0.5f;
                 float y = (sprite.vertices[i].y - Center.y) * invExtend.y + 0.5f;
                 // lerp to position
-                vertice.position = new Vector2(Mathf.Lerp(fourCorners[0].x, fourCorners[2].x, x), Mathf.Lerp(fourCorners[0].y, fourCorners[2].y, y));
-                vertice.color = image.color;
-                vertice.uv0 = sprite.uv[i];
-                vertices.Add(vertice);
+                _vertice.position = new Vector2(Mathf.Lerp(_fourCorners[0].x, _fourCorners[2].x, x), Mathf.Lerp(_fourCorners[0].y, _fourCorners[2].y, y));
+                _vertice.color = _image.color;
+                _vertice.uv0 = sprite.uv[i];
+                vertices.Add(_vertice);
 
-                spriteVertices[i] = vertice.position; // for IsRaycastLocationValid usage
+                _spriteVertices[i] = _vertice.position; // for IsRaycastLocationValid usage
             }
 
-            spriteTriangles = sprite.triangles;
-            len = spriteTriangles.Length;
+            _spriteTriangles = sprite.triangles;
+            len = _spriteTriangles.Length;
             var triangles = new List<int>(len);
             for (int i = 0; i < len; i++)
             {
@@ -97,9 +97,9 @@ namespace DouduckLib.UI
                 (localPos.y + rectTransform.pivot.y * rectTransform.rect.height) / rectTransform.rect.width
             );
 
-            for (int i = 0; i < spriteTriangles.Length; i += 3)
+            for (int i = 0; i < _spriteTriangles.Length; i += 3)
             {
-                if (PointInTriangle(localPos, spriteVertices[spriteTriangles[i]], spriteVertices[spriteTriangles[i + 1]], spriteVertices[spriteTriangles[i + 2]]))
+                if (PointInTriangle(localPos, _spriteVertices[_spriteTriangles[i]], _spriteVertices[_spriteTriangles[i + 1]], _spriteVertices[_spriteTriangles[i + 2]]))
                 {
                     return true;
                 }

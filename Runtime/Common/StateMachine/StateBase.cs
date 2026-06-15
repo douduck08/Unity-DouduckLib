@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,16 +7,16 @@ namespace DouduckLib
 {
     public interface IStateController
     {
-        IState currentState { get; }
+        IState CurrentState { get; }
         void SetState(IState state);
         void StateUpdate();
     }
 
     public interface IState
     {
-        IStateController controller { get; }
-        bool isStarted { get; }
-        bool isCompleted { get; }
+        IStateController Controller { get; }
+        bool IsStarted { get; }
+        bool IsCompleted { get; }
         void Reset(IStateController controller);
         void StateUpdate();
         IState GetNextState();
@@ -24,9 +24,9 @@ namespace DouduckLib
 
     public abstract class StateBase : IState
     {
-        public IStateController controller => _controller;
-        public bool isStarted => _isStarted;
-        public bool isCompleted => _isCompleted;
+        public IStateController Controller => _controller;
+        public bool IsStarted => _isStarted;
+        public bool IsCompleted => _isCompleted;
 
         IStateController _controller;
         bool _isStarted = false;
@@ -44,15 +44,15 @@ namespace DouduckLib
             if (!_isStarted)
             {
                 _isStarted = true;
-                OnStateEnter();
+                OnEnter();
             }
             if (!_isCompleted)
             {
-                OnStateUpdate();
+                OnUpdate();
             }
             if (_isCompleted)
             {
-                OnStateExit();
+                OnExit();
             }
         }
 
@@ -63,9 +63,9 @@ namespace DouduckLib
             _isCompleted = true;
         }
 
-        protected virtual void OnStateEnter() { }
-        protected virtual void OnStateUpdate() { }
-        protected virtual void OnStateExit() { }
+        protected virtual void OnEnter() { }
+        protected virtual void OnUpdate() { }
+        protected virtual void OnExit() { }
 
         public override string ToString()
         {

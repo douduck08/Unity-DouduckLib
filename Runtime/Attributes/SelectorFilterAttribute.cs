@@ -30,7 +30,7 @@ namespace DouduckLib
             return EditorGUI.GetPropertyHeight(property, label, true) * 2f;
         }
 
-        int id;
+        int _id;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -46,21 +46,21 @@ namespace DouduckLib
             btnPos.xMin = fieldPos.xMax;
             property.objectReferenceValue = EditorGUI.ObjectField(fieldPos, label, property.objectReferenceValue, filterAttribute.type, false);
 
-            id = property.propertyPath.GetHashCode();
+            _id = property.propertyPath.GetHashCode();
             if (GUI.Button(btnPos, "⊙"))
             {
                 if (filterAttribute.type == typeof(Sprite))
                 {
-                    EditorGUIUtility.ShowObjectPicker<Sprite>(null, false, filterAttribute.filter, id);
+                    EditorGUIUtility.ShowObjectPicker<Sprite>(null, false, filterAttribute.filter, _id);
                 }
                 else if (filterAttribute.type == typeof(Texture2D))
                 {
-                    EditorGUIUtility.ShowObjectPicker<Texture2D>(null, false, filterAttribute.filter, id);
+                    EditorGUIUtility.ShowObjectPicker<Texture2D>(null, false, filterAttribute.filter, _id);
                 }
             }
 
             var evt = Event.current;
-            if (evt.commandName == "ObjectSelectorUpdated" && id == EditorGUIUtility.GetObjectPickerControlID())
+            if (evt.commandName == "ObjectSelectorUpdated" && _id == EditorGUIUtility.GetObjectPickerControlID())
             {
                 property.objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
             }

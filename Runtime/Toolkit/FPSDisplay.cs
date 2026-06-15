@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace DouduckLib
 {
@@ -11,9 +11,9 @@ namespace DouduckLib
         public bool disableVSync;
         public int targetFPS;
 
-        private float m_deltaTime = 0.0f;
-        private GUIStyle m_style;
-        private Rect m_rect;
+        float _deltaTime = 0.0f;
+        GUIStyle _style;
+        Rect _rect;
 
         void Awake()
         {
@@ -29,22 +29,22 @@ namespace DouduckLib
         void Start()
         {
             float h = Mathf.Lerp(Screen.height / 50f, Screen.height / 10f, textSize);
-            m_rect = new Rect(0, 0, Screen.width, h);
-            m_style = new GUIStyle();
-            m_style.alignment = TextAnchor.UpperLeft;
-            m_style.fontSize = (int)h;
-            m_style.normal.textColor = textColor;
+            _rect = new Rect(0, 0, Screen.width, h);
+            _style = new GUIStyle();
+            _style.alignment = TextAnchor.UpperLeft;
+            _style.fontSize = (int)h;
+            _style.normal.textColor = textColor;
         }
 
         void Update()
         {
-            m_deltaTime += (Time.deltaTime - m_deltaTime) * 0.1f;
+            _deltaTime += (Time.deltaTime - _deltaTime) * 0.1f;
         }
 
         void OnGUI()
         {
-            string text = string.Format("{0:0.0} ms ({1:0.} fps)", m_deltaTime * 1000.0f, 1.0f / m_deltaTime);
-            GUI.Label(m_rect, text, m_style);
+            string text = string.Format("{0:0.0} ms ({1:0.} fps)", _deltaTime * 1000.0f, 1.0f / _deltaTime);
+            GUI.Label(_rect, text, _style);
         }
     }
 }

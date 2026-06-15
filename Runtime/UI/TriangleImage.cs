@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,24 +12,24 @@ namespace DouduckLib.UI
         protected TriangleImage() { }
 
         // GC Friendly
-        private static Vector3[] fourCorners = new Vector3[4];
-        private static UIVertex vertice = new UIVertex();
-        private RectTransform rectTransform = null;
-        private Image image = null;
+        static Vector3[] _fourCorners = new Vector3[4];
+        static UIVertex _vertice = new UIVertex();
+        RectTransform _rectTransform = null;
+        Image _image = null;
         public override void ModifyMesh(VertexHelper vh)
         {
             if (!isActiveAndEnabled)
                 return;
 
-            if (rectTransform == null)
+            if (_rectTransform == null)
             {
-                rectTransform = GetComponent<RectTransform>();
+                _rectTransform = GetComponent<RectTransform>();
             }
-            if (image == null)
+            if (_image == null)
             {
-                image = GetComponent<Image>();
+                _image = GetComponent<Image>();
             }
-            if (image.type != Image.Type.Simple)
+            if (_image.type != Image.Type.Simple)
             {
                 return;
             }
@@ -38,14 +38,14 @@ namespace DouduckLib.UI
                 return;
             }
 
-            rectTransform.GetLocalCorners(fourCorners);
+            _rectTransform.GetLocalCorners(_fourCorners);
             var vertices = new List<UIVertex>(3);
             for (int i = 0; i < 3; i++)
             {
-                vertice.position = fourCorners[i];
-                vertice.color = image.color;
-                vertice.uv0 = GetUV(i);
-                vertices.Add(vertice);
+                _vertice.position = _fourCorners[i];
+                _vertice.color = _image.color;
+                _vertice.uv0 = GetUV(i);
+                vertices.Add(_vertice);
             }
 
             var triangles = new List<int>(3);
@@ -58,20 +58,20 @@ namespace DouduckLib.UI
             vh.AddUIVertexStream(vertices, triangles);
         }
 
-        private Vector2 GetUV(int index)
+        Vector2 GetUV(int index)
         {
             switch (index)
             {
                 case 0:
-                    return new Vector2(0, 0);
+                     return new Vector2(0, 0);
                 case 1:
-                    return new Vector2(0, 1);
+                     return new Vector2(0, 1);
                 case 2:
-                    return new Vector2(1, 1);
+                     return new Vector2(1, 1);
                 case 3:
-                    return new Vector2(1, 0);
+                     return new Vector2(1, 0);
                 default:
-                    return new Vector2();
+                     return new Vector2();
             }
         }
     }

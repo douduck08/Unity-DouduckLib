@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,13 +7,13 @@ namespace DouduckLib
 {
     public sealed class StackedStateController : IStateController
     {
-        Stack<IState> stateStack;
-        public IState currentState
+        Stack<IState> _stateStack;
+        public IState CurrentState
         {
             get
             {
-                if (stateStack.Count > 0)
-                    return stateStack.Peek();
+                if (_stateStack.Count > 0)
+                    return _stateStack.Peek();
                 else
                     return null;
             }
@@ -21,24 +21,24 @@ namespace DouduckLib
 
         public StackedStateController()
         {
-            stateStack = new Stack<IState>();
+            _stateStack = new Stack<IState>();
         }
         public StackedStateController(IState startState)
         {
-            stateStack = new Stack<IState>();
+            _stateStack = new Stack<IState>();
             SetState(startState);
         }
 
         public void SetState(IState state)
         {
-            if (stateStack.Count > 0)
+            if (_stateStack.Count > 0)
             {
-                stateStack.Pop();
+                _stateStack.Pop();
             }
             if (state != null)
             {
                 state.Reset(this);
-                stateStack.Push(state);
+                _stateStack.Push(state);
             }
         }
 
@@ -49,16 +49,16 @@ namespace DouduckLib
                 return;
             }
             state.Reset(this);
-            stateStack.Push(state);
+            _stateStack.Push(state);
         }
 
         public void StateUpdate()
         {
-            var current = currentState;
+            var current = CurrentState;
             if (current != null)
             {
                 current.StateUpdate();
-                if (current.isCompleted)
+                if (current.IsCompleted)
                 {
                     SetState(current.GetNextState());
                 }

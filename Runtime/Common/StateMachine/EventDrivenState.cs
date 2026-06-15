@@ -7,9 +7,9 @@ namespace DouduckLib
 {
     public class EventDrivenState : StateBase
     {
-        public event Action<EventDrivenState> onStateEnter;
-        public event Action<EventDrivenState> onStateUpdate;
-        public event Action<EventDrivenState> onStateExit;
+        public event Action<EventDrivenState> OnStateEnter;
+        public event Action<EventDrivenState> OnStateUpdate;
+        public event Action<EventDrivenState> OnStateExit;
 
         Func<EventDrivenState, EventDrivenState> _getNextState;
 
@@ -29,19 +29,19 @@ namespace DouduckLib
             Complete();
         }
 
-        protected override void OnStateEnter()
+        protected override void OnEnter()
         {
-            onStateEnter?.Invoke(this);
+            OnStateEnter?.Invoke(this);
         }
 
-        protected override void OnStateUpdate()
+        protected override void OnUpdate()
         {
-            onStateUpdate?.Invoke(this);
+            OnStateUpdate?.Invoke(this);
         }
 
-        protected override void OnStateExit()
+        protected override void OnExit()
         {
-            onStateExit?.Invoke(this);
+            OnStateExit?.Invoke(this);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,12 +7,12 @@ namespace DouduckLib
 {
     public abstract class LocalSingletonComponent<T> : LocalSingletonComponent<T, SingletonOption.AutoCreate> where T : SingletonComponentBase { }
 
-    public abstract class LocalSingletonComponent<T, S> : SingletonComponentBase where T : SingletonComponentBase where S : SingletonOption.IOptopn
+    public abstract class LocalSingletonComponent<T, S> : SingletonComponentBase where T : SingletonComponentBase where S : SingletonOption.IOption
     {
-        private static readonly Dictionary<int, T> _loacalInstance = new();
-        private static readonly object _lock = new();
-        private static bool _autoCreating = false;
-        private static bool _applicationIsQuitting = false;
+        static readonly Dictionary<int, T> _localInstance = new();
+        static readonly object _lock = new();
+        static bool _autoCreating = false;
+        static bool _applicationIsQuitting = false;
 
         public static T Get(GameObject gameObject)
         {
@@ -23,15 +23,15 @@ namespace DouduckLib
             lock (_lock)
             {
                 var sceneHandle = gameObject.scene.handle;
-                if (!_loacalInstance.ContainsKey(sceneHandle) && typeof(S) == typeof(SingletonOption.AutoCreate))
+                if (!_localInstance.ContainsKey(sceneHandle) && typeof(S) == typeof(SingletonOption.AutoCreate))
                 {
                     _autoCreating = true;
-                    _loacalInstance.Add(sceneHandle, MoveToScene(CreateInstance<T>(false), gameObject.scene));
+                    _localInstance.Add(sceneHandle, MoveToScene(CreateInstance<T>(false), gameObject.scene));
                     _autoCreating = false;
                 }
-                if (_loacalInstance.ContainsKey(sceneHandle))
+                if (_localInstance.ContainsKey(sceneHandle))
                 {
-                    return _loacalInstance[sceneHandle];
+                    return _localInstance[sceneHandle];
                 }
                 return null;
             }
@@ -53,12 +53,12 @@ namespace DouduckLib
                 return;
             }
             var sceneHandle = gameObject.scene.handle;
-            if (!_loacalInstance.ContainsKey(sceneHandle))
+            if (!_localInstance.ContainsKey(sceneHandle))
             {
-                _loacalInstance.Add(sceneHandle, this as T);
+                _localInstance.Add(sceneHandle, this as T);
                 Debug.Log("[Singleton] An instance of " + typeof(T) + " has became singleton.", this);
             }
-            else if (_loacalInstance[sceneHandle] != this)
+            else if (_localInstance[sceneHandle] != this)
             {
                 throw new System.InvalidOperationException("[Singleton] There should never be more than 1 singleton instance of " + typeof(T) + " in the same scene.");
             }
@@ -67,7 +67,7 @@ namespace DouduckLib
         protected sealed override void OnSingletonDestroyInternal()
         {
             var sceneHandle = gameObject.scene.handle;
-            _loacalInstance.Remove(sceneHandle);
+            _localInstance.Remove(sceneHandle);
         }
 
         protected void OnApplicationQuit()

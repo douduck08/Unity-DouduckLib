@@ -35,11 +35,11 @@ namespace DouduckLib
 
     public class FactoryContainer
     {
-        readonly IDictionary<Type, IFactory> factories = new Dictionary<Type, IFactory>();
+        readonly Dictionary<Type, IFactory> _factories = new Dictionary<Type, IFactory>();
 
         public void Register<TContract>(IFactory factory)
         {
-            factories[typeof(TContract)] = factory;
+            _factories[typeof(TContract)] = factory;
         }
 
         public T Create<T>()
@@ -54,7 +54,7 @@ namespace DouduckLib
 
         public object Create(Type contractType, IEnumerable<object> extraArgs)
         {
-            IFactory factory = factories[contractType];
+            IFactory factory = _factories[contractType];
             Type factoryType = factory.GetType();
             MethodInfo methodInfo = factoryType.GetMethod("Create");
             ParameterInfo[] methodParameters = methodInfo.GetParameters();

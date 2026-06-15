@@ -8,22 +8,22 @@ namespace DouduckLib
 {
     public abstract class ObjectPoolBase<TObject, TData>
     {
-        [SerializeField] TObject prefab;
-        [SerializeField] int initialSize;
+        [SerializeField] TObject _prefab;
+        [SerializeField] int _initialSize;
 
-        bool isInitialized = false;
-        Stack<TObject> inactiveObjects;
-        HashSet<TObject> activeObjects;
+        bool _isInitialized = false;
+        Stack<TObject> _inactiveObjects;
+        HashSet<TObject> _activeObjects;
 
-        Action<TObject> onCreated;
-        Action<TObject, TData> onSpawned;
-        Action<TObject> onDespawned;
-        Action<TObject> onReleased;
+        Action<TObject> _onCreated;
+        Action<TObject, TData> _onSpawned;
+        Action<TObject> _onDespawned;
+        Action<TObject> _onReleased;
 
-        public int activeObjectNumber => activeObjects.Count;
-        public int inactiveObjectNumber => inactiveObjects.Count;
-        public int totalObjectNumber => activeObjects.Count + inactiveObjects.Count;
-        public bool IsInitialized() => isInitialized;
+        public int ActiveObjectNumber => _activeObjects.Count;
+        public int InactiveObjectNumber => _inactiveObjects.Count;
+        public int TotalObjectNumber => _activeObjects.Count + _inactiveObjects.Count;
+        public bool IsInitialized() => _isInitialized;
 
         protected abstract TObject InstantiateObject(TObject prefab);
         protected abstract void ReleaseObject(TObject item);
@@ -31,22 +31,22 @@ namespace DouduckLib
 
         TObject AllocNew(bool active)
         {
-            var item = InstantiateObject(prefab);
-            onCreated?.Invoke(item);
+            var item = InstantiateObject(_prefab);
+            _onCreated?.Invoke(item);
             SetObjectActive(item, active);
             return item;
         }
 
         public ObjectPoolBase<TObject, TData> InitializePool()
         {
-            if (!isInitialized)
+            if (!_isInitialized)
             {
-                isInitialized = true;
-                inactiveObjects = new Stack<TObject>(initialSize);
-                activeObjects = new HashSet<TObject>();
-                for (int i = 0; i < initialSize; i++)
+                _isInitialized = true;
+                _inactiveObjects = new Stack<TObject>(_initialSize);
+                _activeObjects = new HashSet<TObject>();
+                for (int i = 0; i < _initialSize; i++)
                 {
-                    inactiveObjects.Push(AllocNew(false));
+                    _inactiveObjects.Push(AllocNew(false));
                 }
             }
             return this;
@@ -54,51 +54,51 @@ namespace DouduckLib
 
         public ObjectPoolBase<TObject, TData> InitializePool(TObject prefab, int initialSize)
         {
-            this.prefab = prefab;
-            this.initialSize = initialSize;
+            _prefab = prefab;
+            _initialSize = initialSize;
             return InitializePool();
         }
 
         public ObjectPoolBase<TObject, TData> OnCreated(Action<TObject> onCreatedCallback)
         {
-            onCreated = onCreatedCallback;
+            _onCreated = onCreatedCallback;
             return this;
         }
 
         public ObjectPoolBase<TObject, TData> OnSpawned(Action<TObject, TData> onSpawnedCallback)
         {
-            onSpawned = onSpawnedCallback;
+            _onSpawned = onSpawnedCallback;
             return this;
         }
 
         public ObjectPoolBase<TObject, TData> OnDespawned(Action<TObject> onDespawnedCallback)
         {
-            onDespawned = onDespawnedCallback;
+            _onDespawned = onDespawnedCallback;
             return this;
         }
 
         public ObjectPoolBase<TObject, TData> OnReleased(Action<TObject> onReleasedCallback)
         {
-            onReleased = onReleasedCallback;
+            _onReleased = onReleasedCallback;
             return this;
         }
 
         public TObject Spawn(TData spawnParam)
         {
             InitializePool();
-            if (inactiveObjects.Count == 0)
+            if (_inactiveObjects.Count == 0)
             {
                 var item = AllocNew(true);
-                onSpawned?.Invoke(item, spawnParam);
-                activeObjects.Add(item);
+                _onSpawned?.Invoke(item, spawnParam);
+                _activeObjects.Add(item);
                 return item;
             }
             else
             {
-                var item = inactiveObjects.Pop();
+                var item = _inactiveObjects.Pop();
                 SetObjectActive(item, true);
-                onSpawned?.Invoke(item, spawnParam);
-                activeObjects.Add(item);
+                _onSpawned?.Invoke(item, spawnParam);
+                _activeObjects.Add(item);
                 return item;
             }
         }
@@ -106,14 +106,14 @@ namespace DouduckLib
         public void Despawn(TObject item)
         {
             SetObjectActive(item, false);
-            onDespawned?.Invoke(item);
-            activeObjects.Remove(item);
-            inactiveObjects.Push(item);
+            _onDespawned?.Invoke(item);
+            _activeObjects.Remove(item);
+            _inactiveObjects.Push(item);
         }
 
         public void DespawnAll()
         {
-            var objectCache = activeObjects.ToList();
+            var objectCache = _activeObjects.ToList();
             foreach (var item in objectCache)
             {
                 Despawn(item);
@@ -122,24 +122,24 @@ namespace DouduckLib
 
         public void ReleasePool()
         {
-            if (isInitialized)
+            if (_isInitialized)
             {
-                var objectCache = activeObjects.ToList();
+                var objectCache = _activeObjects.ToList();
                 foreach (var item in objectCache)
                 {
                     Despawn(item);
                 }
 
-                objectCache = inactiveObjects.ToList();
+                objectCache = _inactiveObjects.ToList();
                 foreach (var item in objectCache)
                 {
-                    onReleased?.Invoke(item);
+                    _onReleased?.Invoke(item);
                     ReleaseObject(item);
                 }
 
-                activeObjects.Clear();
-                inactiveObjects.Clear();
-                isInitialized = false;
+                _activeObjects.Clear();
+                _inactiveObjects.Clear();
+                _isInitialized = false;
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,14 +13,14 @@ namespace DouduckLib
     public static class NoiseTexture
     {
 
-        static Gradient coloring = new Gradient()
+        static Gradient _coloring = new Gradient()
         {
             colorKeys = new GradientColorKey[] { new GradientColorKey(Color.black, 0), new GradientColorKey(Color.white, 1) }
         };
 
         public static Texture2D CreateNoiseTexture2D(int resolution, float scale = 1f, NoiseType noiseType = NoiseType.Perlin, int octaves = 1, float persistence = 0.5f, float lacunarity = 2f)
         {
-            return CreateNoiseTexture2D(resolution, coloring, scale, noiseType, octaves, persistence, lacunarity);
+            return CreateNoiseTexture2D(resolution, _coloring, scale, noiseType, octaves, persistence, lacunarity);
         }
 
         public static Texture2D CreateNoiseTexture2D(int resolution, Gradient coloring, float scale = 1f, NoiseType noiseType = NoiseType.Perlin, int octaves = 1, float persistence = 0.5f, float lacunarity = 2f)

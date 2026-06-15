@@ -1,49 +1,49 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 namespace DouduckLib
 {
     public abstract class NumericSpring<T>
     {
-        protected T m_target;
-        protected T m_current;
-        protected T m_delta;
+        protected T _target;
+        protected T _current;
+        protected T _delta;
 
-        protected float m_dumpingRatio;
-        protected float m_frequency;
-        protected float m_sensitivity;
+        protected float _dumpingRatio;
+        protected float _frequency;
+        protected float _sensitivity;
 
         public NumericSpring(T origin, float frequency, float dumpingRatio = 1.0f, float sensitivity = 0.01f)
         {
-            m_target = origin;
-            m_current = origin;
-            m_delta = default(T);
+            _target = origin;
+            _current = origin;
+            _delta = default(T);
 
-            m_frequency = frequency;
-            m_dumpingRatio = dumpingRatio;
-            m_sensitivity = sensitivity;
+            _frequency = frequency;
+            _dumpingRatio = dumpingRatio;
+            _sensitivity = sensitivity;
         }
 
         public void SetTarget(T target)
         {
-            m_target = target;
+            _target = target;
         }
 
         public T Next(float deltaTime)
         {
-            float ww = m_frequency * m_frequency;
+            float ww = _frequency * _frequency;
             float wwt = ww * deltaTime;
             float wwtt = wwt * deltaTime;
-            float f = 1.0f + 2.0f * deltaTime * m_dumpingRatio * m_frequency;
+            float f = 1.0f + 2.0f * deltaTime * _dumpingRatio * _frequency;
             float detInv = 1.0f / (f + wwtt);
 
-            m_current = UpdateCurrent(wwtt * detInv, f * detInv, deltaTime * detInv);
-            m_delta = UpdateDelta(wwt * detInv, -wwt * detInv, detInv);
+            _current = UpdateCurrent(wwtt * detInv, f * detInv, deltaTime * detInv);
+            _delta = UpdateDelta(wwt * detInv, -wwt * detInv, detInv);
             if (Insensitive())
             {
-                m_current = m_target;
+                _current = _target;
             }
-            return m_current;
+            return _current;
         }
 
         protected abstract T UpdateCurrent(float targetVar, float currentVar, float deltaVar);
@@ -57,17 +57,17 @@ namespace DouduckLib
 
         protected override float UpdateCurrent(float targetVar, float currentVar, float deltaVar)
         {
-            return targetVar * m_target + currentVar * m_current + deltaVar * m_delta;
+            return targetVar * _target + currentVar * _current + deltaVar * _delta;
         }
 
         protected override float UpdateDelta(float targetVar, float currentVar, float deltaVar)
         {
-            return targetVar * m_target + currentVar * m_current + deltaVar * m_delta;
+            return targetVar * _target + currentVar * _current + deltaVar * _delta;
         }
 
         protected override bool Insensitive()
         {
-            return Mathf.Abs(m_current - m_target) < m_sensitivity;
+            return Mathf.Abs(_current - _target) < _sensitivity;
         }
     }
 
@@ -77,17 +77,17 @@ namespace DouduckLib
 
         protected override Vector2 UpdateCurrent(float targetVar, float currentVar, float deltaVar)
         {
-            return targetVar * m_target + currentVar * m_current + deltaVar * m_delta;
+            return targetVar * _target + currentVar * _current + deltaVar * _delta;
         }
 
         protected override Vector2 UpdateDelta(float targetVar, float currentVar, float deltaVar)
         {
-            return targetVar * m_target + currentVar * m_current + deltaVar * m_delta;
+            return targetVar * _target + currentVar * _current + deltaVar * _delta;
         }
 
         protected override bool Insensitive()
         {
-            return Vector2.Distance(m_current, m_target) < m_sensitivity;
+            return Vector2.Distance(_current, _target) < _sensitivity;
         }
     }
 
@@ -97,17 +97,17 @@ namespace DouduckLib
 
         protected override Vector3 UpdateCurrent(float targetVar, float currentVar, float deltaVar)
         {
-            return targetVar * m_target + currentVar * m_current + deltaVar * m_delta;
+            return targetVar * _target + currentVar * _current + deltaVar * _delta;
         }
 
         protected override Vector3 UpdateDelta(float targetVar, float currentVar, float deltaVar)
         {
-            return targetVar * m_target + currentVar * m_current + deltaVar * m_delta;
+            return targetVar * _target + currentVar * _current + deltaVar * _delta;
         }
 
         protected override bool Insensitive()
         {
-            return Vector3.Distance(m_current, m_target) < m_sensitivity;
+            return Vector3.Distance(_current, _target) < _sensitivity;
         }
     }
 }

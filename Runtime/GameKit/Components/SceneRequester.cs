@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,13 +8,13 @@ namespace DouduckLib
     public class SceneRequester : MonoBehaviour
     {
 
-        [SerializeField, SceneAsset] string activeScene;
-        [SerializeField, SceneAsset] List<string> sceneAssets;
-        [SerializeField] bool loadOnStart;
+        [SerializeField, SceneAsset] string _activeScene;
+        [SerializeField, SceneAsset] List<string> _sceneAssets;
+        [SerializeField] bool _loadOnStart;
 
         void Start()
         {
-            if (loadOnStart)
+            if (_loadOnStart)
             {
                 LoadAllSceneInList();
             }
@@ -22,14 +22,14 @@ namespace DouduckLib
 
         public void LoadAllSceneInList()
         {
-            var scenesToLoad = new List<string>(sceneAssets);
+            var scenesToLoad = new List<string>(_sceneAssets);
             foreach (var scene in UnityUtil.GetAllLoadedScenes())
             {
                 scenesToLoad.Remove(scene.path);
             }
             for (int i = 0; i < scenesToLoad.Count; i++)
             {
-                SceneLoader.Create(true, scenesToLoad[i] == activeScene)
+                SceneLoader.Create(true, scenesToLoad[i] == _activeScene)
                     .AddSceneToLoadByPath(scenesToLoad[i])
                     .StartProcessing(this);
             }
@@ -38,7 +38,7 @@ namespace DouduckLib
         public void UnloadSceneNotInList()
         {
             var scenesToUnload = UnityUtil.GetAllLoadedScenes().Select(p => p.path).ToList();
-            foreach (var scenePath in sceneAssets)
+            foreach (var scenePath in _sceneAssets)
             {
                 scenesToUnload.Remove(scenePath);
             }

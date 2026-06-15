@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -46,24 +46,24 @@ namespace DouduckLib
             }
         }
 
-        public event Action onStartLoading;
-        public event Action onFinishLoading;
-        public event Action<Scene> onSceneUnloaded;
-        public event Action<Scene, LoadSceneMode> onSceneLoaded;
-        public event Action<float> onUpdateProgress;
+        public event Action OnStartLoading;
+        public event Action OnFinishLoading;
+        public event Action<Scene> OnSceneUnloaded;
+        public event Action<Scene, LoadSceneMode> OnSceneLoaded;
+        public event Action<float> OnUpdateProgress;
 
-        public LoadSceneMode loadSceneMode { get; protected set; }
-        public bool isLoadingScene { get; protected set; }
-        public bool isLoadingOver { get; protected set; }
+        public LoadSceneMode LoadSceneMode { get; protected set; }
+        public bool IsLoadingScene { get; protected set; }
+        public bool IsLoadingOver { get; protected set; }
 
         // int sceneIndexToLoad = -1;
         // int sceneIndexToUnload = -1;
         // string sceneToLoad;
         // string sceneToUnload;
 
-        bool setActive;
-        SceneIndexList loadList = new();
-        SceneIndexList unloadList = new();
+        bool _setActive;
+        SceneIndexList _loadList = new();
+        SceneIndexList _unloadList = new();
 
         public static SceneLoader Create(bool additive = true, bool setActiveAfterLoaded = false)
         {
@@ -72,19 +72,19 @@ namespace DouduckLib
 
         SceneLoader(bool additive, bool setActiveAfterLoaded)
         {
-            loadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
-            setActive = setActiveAfterLoaded;
+            LoadSceneMode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
+            _setActive = setActiveAfterLoaded;
         }
 
         public SceneLoader AddSceneToLoadByPath(string path)
         {
-            loadList.AddSceneByPath(path);
+            _loadList.AddSceneByPath(path);
             return this;
         }
 
         public SceneLoader AddSceneToLoadByIndex(int index)
         {
-            loadList.AddSceneByIndex(index);
+            _loadList.AddSceneByIndex(index);
             return this;
         }
 
@@ -92,7 +92,7 @@ namespace DouduckLib
         {
             foreach (var path in paths)
             {
-                loadList.AddSceneByPath(path);
+                _loadList.AddSceneByPath(path);
             }
             return this;
         }
@@ -101,20 +101,20 @@ namespace DouduckLib
         {
             foreach (var index in indexes)
             {
-                loadList.AddSceneByIndex(index);
+                _loadList.AddSceneByIndex(index);
             }
             return this;
         }
 
         public SceneLoader AddSceneToUnloadByPath(string path)
         {
-            unloadList.AddSceneByPath(path);
+            _unloadList.AddSceneByPath(path);
             return this;
         }
 
         public SceneLoader AddSceneToUnloadByIndex(int index)
         {
-            unloadList.AddSceneByIndex(index);
+            _unloadList.AddSceneByIndex(index);
             return this;
         }
 
@@ -122,7 +122,7 @@ namespace DouduckLib
         {
             foreach (var path in paths)
             {
-                unloadList.AddSceneByPath(path);
+                _unloadList.AddSceneByPath(path);
             }
             return this;
         }
@@ -131,44 +131,44 @@ namespace DouduckLib
         {
             foreach (var index in indexes)
             {
-                unloadList.AddSceneByIndex(index);
+                _unloadList.AddSceneByIndex(index);
             }
             return this;
         }
 
-        public SceneLoader OnSceneUnloaded(Action<Scene> callback)
+        public SceneLoader SetOnSceneUnloaded(Action<Scene> callback)
         {
-            onSceneUnloaded += callback;
+            OnSceneUnloaded += callback;
             return this;
         }
 
-        public SceneLoader OnSceneLoaded(Action<Scene, LoadSceneMode> callback)
+        public SceneLoader SetOnSceneLoaded(Action<Scene, LoadSceneMode> callback)
         {
-            onSceneLoaded += callback;
+            OnSceneLoaded += callback;
             return this;
         }
 
-        public SceneLoader OnStartLoading(Action callback)
+        public SceneLoader SetOnStartLoading(Action callback)
         {
-            onStartLoading += callback;
+            OnStartLoading += callback;
             return this;
         }
 
-        public SceneLoader OnFinishLoading(Action callback)
+        public SceneLoader SetOnFinishLoading(Action callback)
         {
-            onFinishLoading += callback;
+            OnFinishLoading += callback;
             return this;
         }
 
-        public SceneLoader OnUpdateProgress(Action<float> callback)
+        public SceneLoader SetOnUpdateProgress(Action<float> callback)
         {
-            onUpdateProgress += callback;
+            OnUpdateProgress += callback;
             return this;
         }
 
         public void StartProcessing(MonoBehaviour owner = null)
         {
-            if (isLoadingScene || isLoadingOver)
+            if (IsLoadingScene || IsLoadingOver)
             {
                 return;
             }
@@ -184,31 +184,31 @@ namespace DouduckLib
 
         IEnumerator LoadingScene()
         {
-            isLoadingScene = true;
-            onStartLoading?.Invoke();
+            IsLoadingScene = true;
+            OnStartLoading?.Invoke();
 
             SceneManager.sceneLoaded += TriggerSceneLoaded;
             SceneManager.sceneUnloaded += TriggerSceneUnloaded;
 
             var unloadOps = new List<AsyncOperation>();
-            for (int i = 0; i < unloadList.Count; i++)
+            for (int i = 0; i < _unloadList.Count; i++)
             {
-                if (unloadList[i] > -1)
+                if (_unloadList[i] > -1)
                 {
-                    var scene = SceneManager.GetSceneByBuildIndex(unloadList[i]);
+                    var scene = SceneManager.GetSceneByBuildIndex(_unloadList[i]);
                     if (scene.isLoaded)
                     {
-                        unloadOps.Add(SceneManager.UnloadSceneAsync(unloadList[i]));
+                        unloadOps.Add(SceneManager.UnloadSceneAsync(_unloadList[i]));
                     }
                 }
             }
 
             var loadOps = new List<AsyncOperation>();
-            for (int i = 0; i < loadList.Count; i++)
+            for (int i = 0; i < _loadList.Count; i++)
             {
-                if (loadList[i] > -1)
+                if (_loadList[i] > -1)
                 {
-                    loadOps.Add(SceneManager.LoadSceneAsync(loadList[i], loadSceneMode));
+                    loadOps.Add(SceneManager.LoadSceneAsync(_loadList[i], LoadSceneMode));
                 }
             }
 
@@ -238,24 +238,24 @@ namespace DouduckLib
                     }
                 }
                 totalProgress = (totalProgress + 1f * (loadOpsCount - loadOps.Count)) / loadOpsCount;
-                onUpdateProgress?.Invoke(totalProgress);
+                OnUpdateProgress?.Invoke(totalProgress);
             }
 
-            if (setActive)
+            if (_setActive)
             {
-                for (int i = 0; i < loadList.Count; i++)
+                for (int i = 0; i < _loadList.Count; i++)
                 {
-                    if (loadList[i] > -1)
+                    if (_loadList[i] > -1)
                     {
-                        var activeScene = SceneManager.GetSceneByBuildIndex(loadList[i]);
+                        var activeScene = SceneManager.GetSceneByBuildIndex(_loadList[i]);
                         SceneManager.SetActiveScene(activeScene);
                     }
                 }
             }
 
-            isLoadingScene = false;
-            isLoadingOver = true;
-            onFinishLoading?.Invoke();
+            IsLoadingScene = false;
+            IsLoadingOver = true;
+            OnFinishLoading?.Invoke();
 
             SceneManager.sceneLoaded -= TriggerSceneLoaded;
             SceneManager.sceneUnloaded -= TriggerSceneUnloaded;
@@ -263,12 +263,12 @@ namespace DouduckLib
 
         void TriggerSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
         {
-            onSceneLoaded?.Invoke(scene, loadSceneMode);
+            OnSceneLoaded?.Invoke(scene, loadSceneMode);
         }
 
         void TriggerSceneUnloaded(Scene scene)
         {
-            onSceneUnloaded?.Invoke(scene);
+            OnSceneUnloaded?.Invoke(scene);
         }
     }
 }

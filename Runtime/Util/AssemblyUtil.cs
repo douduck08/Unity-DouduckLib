@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +12,13 @@ namespace DouduckLib
     public static class AssemblyUtil
     {
 
-        static IEnumerable<Type> m_AssemblyTypes;
+        static IEnumerable<Type> _assemblyTypes;
 
         public static IEnumerable<Type> GetAllAssemblyTypes()
         {
-            if (m_AssemblyTypes == null)
+            if (_assemblyTypes == null)
             {
-                m_AssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
+                _assemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(t =>
                     {
                         // Ugly hack to handle mis-versioned dlls
@@ -31,7 +31,7 @@ namespace DouduckLib
                         return innerTypes;
                     });
             }
-            return m_AssemblyTypes;
+            return _assemblyTypes;
         }
 
         public static List<T> FindAllInstances<T>(Object root, int depthLimit = 10) where T : class
@@ -142,7 +142,7 @@ namespace DouduckLib
         }
     }
 
-    public static class AssemblyExtenstion
+    public static class AssemblyExtension
     {
         public static T GetAttribute<T>(this Type type) where T : Attribute
         {
