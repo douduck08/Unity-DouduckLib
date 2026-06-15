@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -7,7 +7,6 @@ namespace DouduckLibEditor
 {
     public class TexturePackerWindow : EditorWindowBase<TexturePackerWindow>
     {
-
         [MenuItem(EditorUtil.MenuItemPathRoot + "Texture Packer", false, 20)]
         public static void OpenWindow()
         {
@@ -22,53 +21,53 @@ namespace DouduckLibEditor
             Alpha
         }
 
-        const string shaderName = "Hidden/TexturePacker";
+        const string _shaderName = "Hidden/TexturePacker";
 
-        Material material;
-        int resolution = 512;
-        Texture2D preview;
+        Material _material;
+        int _resolution = 512;
+        Texture2D _preview;
 
-        Texture2D textureR;
-        Texture2D textureG;
-        Texture2D textureB;
-        Texture2D textureA;
-        Channel channelR;
-        Channel channelG;
-        Channel channelB;
-        Channel channelA;
+        Texture2D _textureR;
+        Texture2D _textureG;
+        Texture2D _textureB;
+        Texture2D _textureA;
+        Channel _channelR;
+        Channel _channelG;
+        Channel _channelB;
+        Channel _channelA;
 
-        bool foldoutR;
-        bool foldoutG;
-        bool foldoutB;
-        bool foldoutA;
+        bool _foldoutR;
+        bool _foldoutG;
+        bool _foldoutB;
+        bool _foldoutA;
 
         protected override void OnDrawGUIBody()
         {
             EditorGUIWrapper.DrawSection("Noise Settings", () =>
             {
-                foldoutR = EditorGUIWrapper.DrawFoldout(foldoutR, "Red Channel", () =>
+                _foldoutR = EditorGUIWrapper.DrawFoldout(_foldoutR, "Red Channel", () =>
                 {
-                    textureR = (Texture2D)EditorGUILayout.ObjectField("Source Texture", textureR, typeof(Texture2D), false);
-                    channelR = (Channel)EditorGUILayout.EnumPopup("Selected Channel", channelR);
+                    _textureR = (Texture2D)EditorGUILayout.ObjectField("Source Texture", _textureR, typeof(Texture2D), false);
+                    _channelR = (Channel)EditorGUILayout.EnumPopup("Selected Channel", _channelR);
                 });
-                foldoutG = EditorGUIWrapper.DrawFoldout(foldoutG, "Green Channel", () =>
+                _foldoutG = EditorGUIWrapper.DrawFoldout(_foldoutG, "Green Channel", () =>
                 {
-                    textureG = (Texture2D)EditorGUILayout.ObjectField("Source Texture", textureG, typeof(Texture2D), false);
-                    channelG = (Channel)EditorGUILayout.EnumPopup("Selected Channel", channelG);
+                    _textureG = (Texture2D)EditorGUILayout.ObjectField("Source Texture", _textureG, typeof(Texture2D), false);
+                    _channelG = (Channel)EditorGUILayout.EnumPopup("Selected Channel", _channelG);
                 });
-                foldoutB = EditorGUIWrapper.DrawFoldout(foldoutB, "Blue Channel", () =>
+                _foldoutB = EditorGUIWrapper.DrawFoldout(_foldoutB, "Blue Channel", () =>
                 {
-                    textureB = (Texture2D)EditorGUILayout.ObjectField("Source Texture", textureB, typeof(Texture2D), false);
-                    channelB = (Channel)EditorGUILayout.EnumPopup("Selected Channel", channelB);
+                    _textureB = (Texture2D)EditorGUILayout.ObjectField("Source Texture", _textureB, typeof(Texture2D), false);
+                    _channelB = (Channel)EditorGUILayout.EnumPopup("Selected Channel", _channelB);
                 });
-                foldoutA = EditorGUIWrapper.DrawFoldout(foldoutA, "Alpha Channel", () =>
+                _foldoutA = EditorGUIWrapper.DrawFoldout(_foldoutA, "Alpha Channel", () =>
                 {
-                    textureA = (Texture2D)EditorGUILayout.ObjectField("Source Texture", textureA, typeof(Texture2D), false);
-                    channelA = (Channel)EditorGUILayout.EnumPopup("Selected Channel", channelA);
+                    _textureA = (Texture2D)EditorGUILayout.ObjectField("Source Texture", _textureA, typeof(Texture2D), false);
+                    _channelA = (Channel)EditorGUILayout.EnumPopup("Selected Channel", _channelA);
                 });
                 if (GUILayout.Button("Preview"))
                 {
-                    preview = PackageTexture(256);
+                    _preview = PackageTexture(256);
                 }
             });
 
@@ -76,25 +75,25 @@ namespace DouduckLibEditor
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (preview == null)
-                        preview = PackageTexture(256);
-                    EditorGUIWrapper.DrawTexturePreview(preview, new Vector2(256, 256));
+                    if (_preview == null)
+                        _preview = PackageTexture(256);
+                    EditorGUIWrapper.DrawTexturePreview(_preview, new Vector2(256, 256));
                 }
             });
 
             EditorGUIWrapper.DrawSection("Export", () =>
             {
-                resolution = EditorGUILayout.IntField("Resolution", resolution);
+                _resolution = EditorGUILayout.IntField("Resolution", _resolution);
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     if (GUILayout.Button("Export PNG"))
                     {
-                        var tmp = PackageTexture(resolution);
+                        var tmp = PackageTexture(_resolution);
                         EditorUtil.SaveAsPNG(tmp, "packaged texture");
                     }
                     if (GUILayout.Button("Export JPG"))
                     {
-                        var tmp = PackageTexture(resolution);
+                        var tmp = PackageTexture(_resolution);
                         EditorUtil.SaveAsJPG(tmp, "packaged texture");
                     }
                 }
@@ -103,20 +102,20 @@ namespace DouduckLibEditor
 
         Texture2D PackageTexture(int resolution)
         {
-            if (material == null)
-                material = new Material(Shader.Find(shaderName));
+            if (_material == null)
+                _material = new Material(Shader.Find(_shaderName));
 
-            material.SetTexture("_TextureR", textureR);
-            material.SetTexture("_TextureG", textureG);
-            material.SetTexture("_TextureB", textureB);
-            material.SetTexture("_TextureA", textureA);
-            material.SetInt("_ChannelR", (int)channelR);
-            material.SetInt("_ChannelG", (int)channelG);
-            material.SetInt("_ChannelB", (int)channelB);
-            material.SetInt("_ChannelA", (int)channelA);
+            _material.SetTexture("_TextureR", _textureR);
+            _material.SetTexture("_TextureG", _textureG);
+            _material.SetTexture("_TextureB", _textureB);
+            _material.SetTexture("_TextureA", _textureA);
+            _material.SetInt("_ChannelR", (int)_channelR);
+            _material.SetInt("_ChannelG", (int)_channelG);
+            _material.SetInt("_ChannelB", (int)_channelB);
+            _material.SetInt("_ChannelA", (int)_channelA);
 
             RenderTexture tempRT = RenderTexture.GetTemporary(resolution, resolution);
-            Graphics.Blit(null, tempRT, material);
+            Graphics.Blit(null, tempRT, _material);
             RenderTexture.active = tempRT;
 
             Texture2D result = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);

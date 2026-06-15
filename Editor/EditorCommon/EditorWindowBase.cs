@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -7,24 +7,23 @@ namespace DouduckLibEditor
 {
     public abstract class EditorWindowBase<T> : EditorWindow where T : EditorWindow
     {
-
         protected static void Open(string title)
         {
             T window = EditorWindow.GetWindow<T>(false, title, true);
             window.minSize = new Vector2(256, 256);
         }
 
-        protected Object target;
-        protected SerializedObject serializedObject;
+        protected Object _target;
+        protected SerializedObject _serializedObject;
 
-        Vector2 scrollPos;
+        Vector2 _scrollPos;
 
         void Initialize()
         {
-            if (target == null)
+            if (_target == null)
             {
-                target = this;
-                serializedObject = new SerializedObject(target);
+                _target = this;
+                _serializedObject = new SerializedObject(_target);
             }
         }
 
@@ -55,9 +54,9 @@ namespace DouduckLibEditor
                 // }
             }
 
-            using (var scrollView = new EditorGUILayout.ScrollViewScope(scrollPos))
+            using (var scrollView = new EditorGUILayout.ScrollViewScope(_scrollPos))
             {
-                scrollPos = scrollView.scrollPosition;
+                _scrollPos = scrollView.scrollPosition;
                 OnDrawGUIBody();
             }
         }

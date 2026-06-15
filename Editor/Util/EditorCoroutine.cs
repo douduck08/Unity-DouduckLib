@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -7,17 +7,16 @@ namespace DouduckLibEditor
 {
     public class EditorCoroutine
     {
-
         public static EditorCoroutine Start(IEnumerator coroutine)
         {
             return new EditorCoroutine(coroutine).Start();
         }
 
-        IEnumerator routine;
+        IEnumerator _routine;
 
-        EditorCoroutine(IEnumerator _routine)
+        EditorCoroutine(IEnumerator routine)
         {
-            routine = _routine;
+            _routine = routine;
         }
 
         EditorCoroutine Start()
@@ -33,7 +32,7 @@ namespace DouduckLibEditor
 
         void Update()
         {
-            if (!routine.MoveNext())
+            if (!_routine.MoveNext())
             {
                 Stop();
             }

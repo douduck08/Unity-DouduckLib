@@ -7,13 +7,12 @@ namespace DouduckLibEditor
 {
     public static class CaptureScreenshotTool
     {
-
-        readonly static string screenshotFilePath = "../Screenshot";
+        static readonly string _screenshotFilePath = "../Screenshot";
 
         [MenuItem("Edit/Capture Screenshot %k")]
         static void CaptureScreenshot()
         {
-            string path = Path.Combine(Application.dataPath, screenshotFilePath);
+            string path = Path.Combine(Application.dataPath, _screenshotFilePath);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

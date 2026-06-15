@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -8,39 +8,38 @@ namespace DouduckLibEditor
 {
     public class NoiseGeneratorWindow : EditorWindowBase<NoiseGeneratorWindow>
     {
-
         [MenuItem(EditorUtil.MenuItemPathRoot + "Noise Texture Generator", false, 20)]
         public static void OpenWindow()
         {
             Open("Noise Texture Generator");
         }
 
-        NoiseType noiseType = NoiseType.Perlin;
-        Gradient coloring = new Gradient()
+        NoiseType _noiseType = NoiseType.Perlin;
+        Gradient _coloring = new Gradient()
         {
             colorKeys = new GradientColorKey[] { new GradientColorKey(Color.black, 0), new GradientColorKey(Color.white, 1) }
         };
-        float scale = 16f;
-        int octaves = 1;
-        float persistence = 0.5f;
-        float lacunarity = 2f;
+        float _scale = 16f;
+        int _octaves = 1;
+        float _persistence = 0.5f;
+        float _lacunarity = 2f;
 
-        int resolution = 512;
-        Texture2D preview;
+        int _resolution = 512;
+        Texture2D _preview;
 
         protected override void OnDrawGUIBody()
         {
             EditorGUIWrapper.DrawSection("Noise Settings", () =>
             {
-                noiseType = (NoiseType)EditorGUILayout.EnumPopup("Noise Type", noiseType);
-                coloring = EditorGUIWrapper.DrawGradientField("Coloring", coloring);
-                scale = EditorGUILayout.Slider("Scale", scale, 1f, 100f);
-                octaves = EditorGUILayout.IntSlider("Octaves", octaves, 1, 8);
-                persistence = EditorGUILayout.Slider("Persistence", persistence, 0f, 1f);
-                lacunarity = EditorGUILayout.Slider("Lacunarity", lacunarity, 1f, 4f);
+                _noiseType = (NoiseType)EditorGUILayout.EnumPopup("Noise Type", _noiseType);
+                _coloring = EditorGUIWrapper.DrawGradientField("Coloring", _coloring);
+                _scale = EditorGUILayout.Slider("Scale", _scale, 1f, 100f);
+                _octaves = EditorGUILayout.IntSlider("Octaves", _octaves, 1, 8);
+                _persistence = EditorGUILayout.Slider("Persistence", _persistence, 0f, 1f);
+                _lacunarity = EditorGUILayout.Slider("Lacunarity", _lacunarity, 1f, 4f);
                 if (GUILayout.Button("Preview"))
                 {
-                    preview = NoiseTexture.CreateNoiseTexture2D(256, coloring, scale, noiseType, octaves, persistence, lacunarity);
+                    _preview = NoiseTexture.CreateNoiseTexture2D(256, _coloring, _scale, _noiseType, _octaves, _persistence, _lacunarity);
                 }
             });
 
@@ -48,24 +47,24 @@ namespace DouduckLibEditor
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (preview == null)
-                        preview = Texture2D.whiteTexture;
-                    EditorGUIWrapper.DrawTexturePreview(preview, new Vector2(256, 256));
+                    if (_preview == null)
+                        _preview = Texture2D.whiteTexture;
+                    EditorGUIWrapper.DrawTexturePreview(_preview, new Vector2(256, 256));
                 }
             });
             EditorGUIWrapper.DrawSection("Export", () =>
             {
-                resolution = EditorGUILayout.IntField("Resolution", resolution);
+                _resolution = EditorGUILayout.IntField("Resolution", _resolution);
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     if (GUILayout.Button("Export PNG"))
                     {
-                        var tmp = NoiseTexture.CreateNoiseTexture2D(resolution, coloring, scale, noiseType, octaves, persistence, lacunarity);
+                        var tmp = NoiseTexture.CreateNoiseTexture2D(_resolution, _coloring, _scale, _noiseType, _octaves, _persistence, _lacunarity);
                         EditorUtil.SaveAsPNG(tmp, "noise texture");
                     }
                     if (GUILayout.Button("Export JPG"))
                     {
-                        var tmp = NoiseTexture.CreateNoiseTexture2D(resolution, coloring, scale, noiseType, octaves, persistence, lacunarity);
+                        var tmp = NoiseTexture.CreateNoiseTexture2D(_resolution, _coloring, _scale, _noiseType, _octaves, _persistence, _lacunarity);
                         EditorUtil.SaveAsJPG(tmp, "noise texture");
                     }
                 }

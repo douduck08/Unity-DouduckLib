@@ -28,7 +28,7 @@ namespace DouduckLibEditor.UI
         static void CreateHorizontalGroup(MenuCommand menuCommand) => CreateObjectWithComponent<HorizontalLayoutGroup>(menuCommand, "HorizontalGroup");
 
         [MenuItem(uiMenuItemPath + "Non-Raycast Image")]
-        static void CreatImage(MenuCommand menuCommand)
+        static void CreateImage(MenuCommand menuCommand)
         {
             EditorApplication.ExecuteMenuItem("GameObject/UI/Image");
             GameObject go = Selection.activeGameObject;
@@ -37,7 +37,7 @@ namespace DouduckLibEditor.UI
         }
 
         [MenuItem(uiMenuItemPath + "Non-Raycast Text")]
-        static void CreatText(MenuCommand menuCommand)
+        static void CreateText(MenuCommand menuCommand)
         {
             EditorApplication.ExecuteMenuItem("GameObject/UI/Text");
             GameObject go = Selection.activeGameObject;
