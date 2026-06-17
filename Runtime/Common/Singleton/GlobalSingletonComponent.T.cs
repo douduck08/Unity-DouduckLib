@@ -51,8 +51,12 @@ namespace DouduckLib
 
         protected sealed override void OnSingletonDestroyInternal()
         {
-            _applicationIsQuitting = true;
             _instance = null;
+        }
+
+        protected void OnApplicationQuit()
+        {
+            _applicationIsQuitting = true;
         }
     }
 }

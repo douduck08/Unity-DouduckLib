@@ -11,8 +11,13 @@ namespace DouduckLib
 
         public ObjectPoolBase<TObject, TData> InitializePool(TObject prefab, Transform instantiateParent, int initialSize)
         {
+            return InitializePool(prefab, instantiateParent, initialSize, 0);
+        }
+
+        public ObjectPoolBase<TObject, TData> InitializePool(TObject prefab, Transform instantiateParent, int initialSize, int maxSize)
+        {
             _instantiateParent = instantiateParent;
-            return InitializePool(prefab, initialSize);
+            return InitializePool(prefab, initialSize, maxSize);
         }
 
         protected override TObject InstantiateObject(TObject prefab)

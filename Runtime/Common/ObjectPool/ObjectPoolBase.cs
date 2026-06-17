@@ -10,6 +10,7 @@ namespace DouduckLib
     {
         [SerializeField] TObject _prefab;
         [SerializeField] int _initialSize;
+        [SerializeField] int _maxSize;
 
         bool _isInitialized = false;
         Stack<TObject> _inactiveObjects;
@@ -54,8 +55,14 @@ namespace DouduckLib
 
         public ObjectPoolBase<TObject, TData> InitializePool(TObject prefab, int initialSize)
         {
+            return InitializePool(prefab, initialSize, 0);
+        }
+
+        public ObjectPoolBase<TObject, TData> InitializePool(TObject prefab, int initialSize, int maxSize)
+        {
             _prefab = prefab;
             _initialSize = initialSize;
+            _maxSize = maxSize;
             return InitializePool();
         }
 
@@ -108,15 +115,34 @@ namespace DouduckLib
             SetObjectActive(item, false);
             _onDespawned?.Invoke(item);
             _activeObjects.Remove(item);
-            _inactiveObjects.Push(item);
+
+            if (_maxSize > 0 && _inactiveObjects.Count >= _maxSize)
+            {
+                _onReleased?.Invoke(item);
+                ReleaseObject(item);
+            }
+            else
+            {
+                _inactiveObjects.Push(item);
+            }
         }
 
         public void DespawnAll()
         {
-            var objectCache = _activeObjects.ToList();
-            foreach (var item in objectCache)
+            while (_activeObjects.Count > 0)
             {
-                Despawn(item);
+                var enumerator = _activeObjects.GetEnumerator();
+                if (enumerator.MoveNext())
+                {
+                    var item = enumerator.Current;
+                    enumerator.Dispose();
+                    Despawn(item);
+                }
+                else
+                {
+                    enumerator.Dispose();
+                    break;
+                }
             }
         }
 
@@ -124,15 +150,11 @@ namespace DouduckLib
         {
             if (_isInitialized)
             {
-                var objectCache = _activeObjects.ToList();
-                foreach (var item in objectCache)
-                {
-                    Despawn(item);
-                }
+                DespawnAll();
 
-                objectCache = _inactiveObjects.ToList();
-                foreach (var item in objectCache)
+                while (_inactiveObjects.Count > 0)
                 {
+                    var item = _inactiveObjects.Pop();
                     _onReleased?.Invoke(item);
                     ReleaseObject(item);
                 }
