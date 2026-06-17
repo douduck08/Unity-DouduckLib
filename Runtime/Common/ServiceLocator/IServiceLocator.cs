@@ -50,6 +50,7 @@ namespace DouduckLib
         {
             if (serviceLocator.HasService(service.GetType()))
             {
+                Debug.LogWarning($"[ServiceLocator] Service of type '{service.GetType()}' is already registered.");
                 return false;
             }
             return serviceLocator.AddServiceInternal(service);
@@ -59,6 +60,7 @@ namespace DouduckLib
         {
             if (serviceLocator.HasService<T>())
             {
+                Debug.LogWarning($"[ServiceLocator] Service of type '{typeof(T)}' is already registered.");
                 return false;
             }
             return serviceLocator.AddServiceInternal(new T());
@@ -68,6 +70,7 @@ namespace DouduckLib
         {
             if (serviceLocator.HasService<T>())
             {
+                Debug.LogWarning($"[ServiceLocator] Service of type '{typeof(T)}' is already registered.");
                 return false;
             }
             return serviceLocator.AddServiceInternal(serviceLocator.Owner.AddComponent<T>());
