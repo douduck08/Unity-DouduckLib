@@ -42,22 +42,63 @@ namespace DouduckLib
             _factories[typeof(TContract)] = factory;
         }
 
-        public T Create<T>()
+        public TValue Create<TValue>()
         {
-            return (T)Create(typeof(T), new object[0]);
+            if (_factories.TryGetValue(typeof(TValue), out var factory))
+            {
+                return ((IFactory<TValue>)factory).Create();
+            }
+            throw new KeyNotFoundException($"Factory for {typeof(TValue)} not registered.");
         }
 
+        public TValue Create<TParam1, TValue>(TParam1 param)
+        {
+            if (_factories.TryGetValue(typeof(TValue), out var factory))
+            {
+                return ((IFactory<TParam1, TValue>)factory).Create(param);
+            }
+            throw new KeyNotFoundException($"Factory for {typeof(TValue)} not registered.");
+        }
+
+        public TValue Create<TParam1, TParam2, TValue>(TParam1 param1, TParam2 param2)
+        {
+            if (_factories.TryGetValue(typeof(TValue), out var factory))
+            {
+                return ((IFactory<TParam1, TParam2, TValue>)factory).Create(param1, param2);
+            }
+            throw new KeyNotFoundException($"Factory for {typeof(TValue)} not registered.");
+        }
+
+        public TValue Create<TParam1, TParam2, TParam3, TValue>(TParam1 param1, TParam2 param2, TParam3 param3)
+        {
+            if (_factories.TryGetValue(typeof(TValue), out var factory))
+            {
+                return ((IFactory<TParam1, TParam2, TParam3, TValue>)factory).Create(param1, param2, param3);
+            }
+            throw new KeyNotFoundException($"Factory for {typeof(TValue)} not registered.");
+        }
+
+        public TValue Create<TParam1, TParam2, TParam3, TParam4, TValue>(TParam1 param1, TParam2 param2, TParam3 param3, TParam4 param4)
+        {
+            if (_factories.TryGetValue(typeof(TValue), out var factory))
+            {
+                return ((IFactory<TParam1, TParam2, TParam3, TParam4, TValue>)factory).Create(param1, param2, param3, param4);
+            }
+            throw new KeyNotFoundException($"Factory for {typeof(TValue)} not registered.");
+        }
+
+        [Obsolete("Use strongly-typed Create methods instead to avoid reflection overhead.")]
         public T Create<T>(IEnumerable<object> extraArgs)
         {
             return (T)Create(typeof(T), extraArgs);
         }
 
+        [Obsolete("Use strongly-typed Create methods instead to avoid reflection overhead.")]
         public object Create(Type contractType, IEnumerable<object> extraArgs)
         {
             IFactory factory = _factories[contractType];
             Type factoryType = factory.GetType();
             MethodInfo methodInfo = factoryType.GetMethod("Create");
-            ParameterInfo[] methodParameters = methodInfo.GetParameters();
             return methodInfo.Invoke(factory, extraArgs.ToArray());
         }
     }
