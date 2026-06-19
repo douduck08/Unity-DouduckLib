@@ -5,18 +5,16 @@
 ## 核心介面與類別
 
 ### 控制器（Controllers）
-- `StateController`：標準的狀態機控制器。管理一個當前狀態。在 `StateUpdate()` 中驅動當前狀態的生命週期，並在當前狀態標記為完成（`IsCompleted == true`）時，自動切換至 `GetNextState()` 所返回的下一個狀態。
+- `StateController`：標準的狀態機控制器，管理一個當前狀態。在 `StateUpdate()` 中驅動當前狀態的生命週期，並在當前狀態標記為完成（`IsCompleted == true`）時，自動切換至 `GetNextState()` 所返回的下一個狀態。
 
-### 狀態基底類別（States）
-1. `StateBase`
-   - 純 C# 類別的狀態抽象基底類別。
-   - 封裝了狀態的生命週期：`OnEnter()` -> `OnUpdate()` -> `OnExit()`。
-   - 透過呼叫 `Complete()` 標記此狀態完成，以通知控制器進行狀態轉移。
-2. `ComponentState`
-   - 繼承自 `MonoBehaviour` 的狀態基底類別，實作 `IState`。
-3. `EventDrivenState`
-   - 事件驅動型狀態，繼承自 `StateBase`。
-   - **無需自訂子類**，可以直接透過事件訂閱（`OnStateEnter`, `OnStateUpdate`, `OnStateExit`）與設定下一個狀態委派函式（`SetNextStateFunction`）來定義狀態。
+### 狀態（States）
+1. `IState` & `IStateController`：定義在 `IState.cs` 中，為狀態機運作的核心介面。
+2. `State`：整合了繼承與事件驅動（Event-driven）雙重模式的具體 C# 類別。
+   - **繼承用法**：可作為自訂狀態的基底類別，透過 `override` 生命週期方法（`OnEnter`、`OnUpdate`、`OnExit`）來實作邏輯。
+   - **事件用法**：可直接 `new State()` 實例化，並透過訂閱 `OnStateEnter`、`OnStateUpdate`、`OnStateExit` 事件與呼叫 `SetNextStateFunction` 來動態組合狀態行為，無需額外宣告類別。
+3. `ScriptableState`：繼承自 `ScriptableObject` 的狀態基底類別，適用於需要在 Unity Inspector 中配置參數的狀態設計（不支援動態事件，以保持純粹性）。
+
+---
 
 ## 生命週期流程圖
 
@@ -34,78 +32,66 @@ graph TD
     G --> H[Controller switches to GetNextState]
 ```
 
+---
+
 ## 使用範例
 
-### 1. 使用 `StateController` 與自訂 `StateBase`
+### 1. 使用繼承模式的 `State`
 
 ```csharp
 using UnityEngine;
 using DouduckLib;
 
-public class SomeClass : MonoBehaviour
+public class CustomPatrolState : State
 {
-    StateController _stateController;
+    float _patrolSpeed = 5f;
 
-    void Start()
+    protected override void OnEnter() 
     {
-        _stateController = new StateController(new SomeState(this));
+        Debug.Log("開始巡邏");
     }
-
-    void Update()
-    {
-        _stateController.StateUpdate();
-    }
-}
-
-public class SomeState : StateBase
-{
-    SomeClass _owner;
-
-    public SomeState(SomeClass owner) => _owner = owner;
-
-    protected override void OnEnter() { }
 
     protected override void OnUpdate()
     {
-        // 滿足特定條件時標記完成
-        Complete();
+        // 巡邏移動邏輯...
+        if (/* 發現敵人 */ true)
+        {
+            Complete(); // 標記此狀態完成
+        }
     }
 
-    protected override void OnExit() { }
+    protected override void OnExit() 
+    {
+        Debug.Log("結束巡邏");
+    }
 
     public override IState GetNextState()
     {
-        return new AnotherState(_owner);
+        // 返回下一個要切換的狀態
+        return new CustomChaseState();
     }
-}
-
-public class AnotherState : StateBase
-{
-    SomeClass _owner;
-    public AnotherState(SomeClass owner) => _owner = owner;
-
-    public override IState GetNextState() => null;
 }
 ```
 
-### 2. 使用 `EventDrivenState` 
+### 2. 使用事件驅動（Event-Driven）的 `State`
 
-適用於不需要特別宣告類別的快速開發情境：
+適用於不需要特別宣告類別的快速開發或流程控制情境：
 
 ```csharp
 using UnityEngine;
 using DouduckLib;
 
-public class AnotherClass : MonoBehaviour
+public class GameFlowController : MonoBehaviour
 {
     StateController _flowController;
 
     void Start()
     {
-        var firstState = new EventDrivenState();
-        var secondState = new EventDrivenState();
+        var firstState = new State();
+        var secondState = new State();
 
-        firstState.OnStateEnter += state => { /* 進入邏輯 */ };
+        // 訂閱事件
+        firstState.OnStateEnter += state => Debug.Log("進入狀態一");
         firstState.OnStateUpdate += state =>
         {
             if (/* 滿足條件 */ true)
@@ -113,9 +99,11 @@ public class AnotherClass : MonoBehaviour
                 state.SetComplete();
             }
         };
+        
+        // 設定下一個狀態轉換（可返回任何 IState）
         firstState.SetNextStateFunction(state => secondState);
 
-        secondState.OnStateEnter += state => { /* 進入邏輯 */ };
+        secondState.OnStateEnter += state => Debug.Log("進入狀態二");
 
         _flowController = new StateController(firstState);
     }
@@ -127,20 +115,40 @@ public class AnotherClass : MonoBehaviour
 }
 ```
 
-## 常用 API 說明
+### 3. 使用 `ScriptableState`（配置式狀態）
 
-### `IStateController`
+適合建立可重複使用的配置檔（Asset），並在 Inspector 中調整參數：
 
-| 方法名稱 | 說明 |
-| :--- | :--- |
-| `SetState(IState state)` | 立即將當前狀態切換為 `state`。 |
-| `StateUpdate()` | 驅動當前狀態更新，並在完成時自動執行狀態轉移。 |
+```csharp
+using UnityEngine;
+using DouduckLib;
 
-### `IState` 與 `StateBase`
+[CreateAssetMenu(menuName = "AI/States/Patrol")]
+public class ScriptablePatrolState : ScriptableState
+{
+    [SerializeField] float _speed = 3.5f;
+    [SerializeField] ScriptableState _nextStateAsset;
 
-| 方法名稱 / 屬性 | 說明 |
-| :--- | :--- |
-| `Complete()` | *(保護方法)* 標記狀態為已完成（`IsCompleted = true`）。 |
-| `GetNextState()` | *(抽象方法)* 定義並返回此狀態完成後所要切換的下一個狀態。 |
-| `IsStarted` | *(屬性)* 是否已開始執行（已觸發 `OnEnter`）。 |
-| `IsCompleted` | *(屬性)* 是否已完成執行（將會觸發 `OnExit`）。 |
+    protected override void OnEnter() { }
+    protected override void OnUpdate()
+    {
+        // 使用 _speed 進行巡邏
+        if (/* 條件滿足 */ true)
+        {
+            Complete();
+        }
+    }
+
+    public override IState GetNextState()
+    {
+        return _nextStateAsset;
+    }
+}
+```
+
+---
+
+## 生命週期時序與特徵
+
+- **即時退出**：在 `StateUpdate()` 中，如果在 `OnEnter()` 或 `OnUpdate()` 中呼叫了 `Complete()`，`OnExit()` 會在**同一次 `StateUpdate()` 調用中立即執行**。
+- **跨 Frame 進入**：當狀態判定為 `IsCompleted == true` 並執行 `OnExit()` 後，控制器會在當下呼叫 `SetState(GetNextState())` 以切換狀態。新狀態的 `Initialize()` 會在當下執行，但新狀態的 `OnEnter()` 會在**下一個 Frame**（下一次呼叫控制器的 `StateUpdate()` 時）才執行。

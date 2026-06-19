@@ -25,7 +25,7 @@ namespace DouduckLib
         {
             if (state != null)
             {
-                state.Reset(this);
+                state.Initialize(this);
                 _currentState = state;
             }
         }

@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckLib
 {
-    public abstract class ComponentState : MonoBehaviour, IState
+    public abstract class ScriptableState : ScriptableObject, IState
     {
         public IStateController Controller => _controller;
         public bool IsStarted => _isStarted;
@@ -14,7 +12,7 @@ namespace DouduckLib
         bool _isStarted = false;
         bool _isCompleted = false;
 
-        public void Reset(IStateController controller)
+        public void Initialize(IStateController controller)
         {
             _controller = controller;
             _isStarted = false;
@@ -48,5 +46,10 @@ namespace DouduckLib
         protected virtual void OnEnter() { }
         protected virtual void OnUpdate() { }
         protected virtual void OnExit() { }
+
+        public override string ToString()
+        {
+            return string.Format("<ScriptableState>{0}", GetType().Name);
+        }
     }
 }
