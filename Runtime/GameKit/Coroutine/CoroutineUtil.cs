@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,39 +7,70 @@ namespace DouduckLib
 {
     public class CoroutineUtil : GlobalSingletonComponent<CoroutineUtil>
     {
-        public static void StartCoroutineOnDontDestroy(IEnumerator routine)
+        static readonly Dictionary<float, WaitForSeconds> _waitForSecondsCache = new();
+
+        public static WaitForSeconds GetWaitForSeconds(float seconds)
         {
-            Get()?.StartCoroutine(routine);
+            if (!_waitForSecondsCache.TryGetValue(seconds, out var wait))
+            {
+                wait = new WaitForSeconds(seconds);
+                _waitForSecondsCache.Add(seconds, wait);
+            }
+            return wait;
         }
 
-        public static void RunDelaySeconds(Action callback, float seconds)
+        public static void StartCoroutineOnDontDestroy(IEnumerator routine)
         {
-            if (callback != null)
+            var util = Get();
+            if (util != null)
             {
-                Get()?.StartCoroutine(DelaySeconds(callback, seconds));
+                util.StartCoroutine(routine);
             }
         }
 
-        static IEnumerator DelaySeconds(Action callback, float seconds)
+        public static void RunDelaySeconds(float seconds, Action callback)
         {
-            yield return new WaitForSeconds(seconds);
+            if (callback != null)
+            {
+                var util = Get();
+                if (util != null)
+                {
+                    util.StartCoroutine(DelaySeconds(seconds, callback));
+                }
+            }
+        }
+
+        static IEnumerator DelaySeconds(float seconds, Action callback)
+        {
+            yield return GetWaitForSeconds(seconds);
             callback.Invoke();
         }
 
-        public static void RunDelayFrames(Action callback, int frames)
+        public static void RunDelayFrames(int frames, Action callback)
         {
             if (callback != null)
             {
-                Get()?.StartCoroutine(DelayFrames(callback, frames));
+                var util = Get();
+                if (util != null)
+                {
+                    util.StartCoroutine(DelayFrames(frames, callback));
+                }
             }
         }
 
-        static IEnumerator DelayFrames(Action callback, int frames)
+        static IEnumerator DelayFrames(int frames, Action callback)
         {
-            while (frames > 0)
+            if (frames <= 0)
             {
-                frames -= 1;
                 yield return null;
+            }
+            else
+            {
+                while (frames > 0)
+                {
+                    frames -= 1;
+                    yield return null;
+                }
             }
             callback.Invoke();
         }

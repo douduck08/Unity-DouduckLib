@@ -1,75 +1,81 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace DouduckLib
 {
+    internal class WaitForCounter : CustomYieldInstruction
+    {
+        int _counter;
+
+        public WaitForCounter(int count)
+        {
+            _counter = count;
+        }
+
+        public void Decrement()
+        {
+            _counter--;
+        }
+
+        public override bool keepWaiting => _counter > 0;
+    }
+
     public static class CoroutineHandle
     {
         public static IEnumerator Delay(float seconds, Action onFinish)
         {
-            var wait = new WaitForSeconds(seconds);
+            yield return CoroutineUtil.GetWaitForSeconds(seconds);
 
-            yield return wait;
-
-            if (onFinish != null)
-            {
-                onFinish.Invoke();
-            }
+            onFinish?.Invoke();
         }
 
         public static IEnumerator DelayEnumerator(float seconds, IEnumerator enumerator, Action onFinish)
         {
-            var wait = new WaitForSeconds(seconds);
-
-            yield return wait;
+            yield return CoroutineUtil.GetWaitForSeconds(seconds);
             yield return enumerator;
 
-            if (onFinish != null)
-            {
-                onFinish.Invoke();
-            }
+            onFinish?.Invoke();
         }
 
         public static IEnumerator CallbackEnumerator(IEnumerator enumerator, Action onFinish)
         {
             yield return enumerator;
 
-            if (onFinish != null)
-            {
-                onFinish.Invoke();
-            }
+            onFinish?.Invoke();
         }
 
         public static IEnumerator ParallelEnumerator(MonoBehaviour owner, Action onFinish, params IEnumerator[] enumerators)
         {
-            var counter = enumerators.Length;
-            var wait = new WaitUntil(() => counter == 0);
+            if (enumerators == null || enumerators.Length == 0)
+            {
+                onFinish?.Invoke();
+                yield break;
+            }
+
+            var wait = new WaitForCounter(enumerators.Length);
 
             for (int i = 0; i < enumerators.Length; i++)
             {
-                owner.StartCoroutine(CallbackEnumerator(enumerators[i], () => counter--));
+                owner.StartCoroutine(CallbackEnumerator(enumerators[i], wait.Decrement));
             }
             yield return wait;
 
-            if (onFinish != null)
-            {
-                onFinish.Invoke();
-            }
+            onFinish?.Invoke();
         }
 
         public static IEnumerator QueueEnumerator(Action onFinish, params IEnumerator[] enumerators)
         {
-            for (int i = 0; i < enumerators.Length; i++)
+            if (enumerators != null)
             {
-                yield return enumerators[i];
+                for (int i = 0; i < enumerators.Length; i++)
+                {
+                    yield return enumerators[i];
+                }
             }
 
-            if (onFinish != null)
-            {
-                onFinish.Invoke();
-            }
+            onFinish?.Invoke();
         }
     }
 }

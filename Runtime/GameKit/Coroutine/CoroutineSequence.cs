@@ -5,9 +5,35 @@ using UnityEngine;
 
 namespace DouduckLib
 {
+    public struct CoroutineSequenceYieldInstruction : IEnumerator
+    {
+        readonly Coroutine _coroutine;
+        bool _isDone;
+
+        public bool IsValid => _coroutine != null;
+
+        public CoroutineSequenceYieldInstruction(Coroutine coroutine)
+        {
+            _coroutine = coroutine;
+            _isDone = false;
+        }
+
+        public object Current => _coroutine;
+
+        public bool MoveNext()
+        {
+            if (!_isDone)
+            {
+                _isDone = true;
+                return _coroutine != null;
+            }
+            return false;
+        }
+
+        public void Reset() {}
+    }
     public class CoroutineSequence
     {
-
         class InsertedEnumerator
         {
             public IEnumerator InternalEnumerator { get; private set; }
@@ -41,32 +67,43 @@ namespace DouduckLib
                 InternalEnumerator = enumerator;
             }
 
-            public IEnumerator GetEnumerator()
+            public IEnumerator GetEnumerator(MonoBehaviour owner, List<Coroutine> coroutines)
             {
-                yield return InternalEnumerator;
+                if (_jointEnumerators.Count == 0)
+                {
+                    yield return InternalEnumerator;
+                }
+                else
+                {
+                    var all = new List<IEnumerator>(_jointEnumerators.Count + 1);
+                    all.Add(InternalEnumerator);
+                    all.AddRange(_jointEnumerators);
+
+                    var wait = new WaitForCounter(all.Count);
+
+                    for (int i = 0; i < all.Count; i++)
+                    {
+                        var coroutine = owner.StartCoroutine(CoroutineHandle.CallbackEnumerator(all[i], wait.Decrement));
+                        coroutines.Add(coroutine);
+                    }
+                    yield return wait;
+                }
             }
 
             public void AddJointEnumerator(IEnumerator enumerator)
             {
                 _jointEnumerators.Add(enumerator);
             }
-
-            public void StartJointCoroutine(MonoBehaviour owner, List<Coroutine> coroutines)
-            {
-                for (int i = 0; i < _jointEnumerators.Count; i++)
-                {
-                    coroutines.Add(owner.StartCoroutine(_jointEnumerators[i]));
-                }
-            }
         }
 
-        List<Coroutine> _coroutines = new List<Coroutine>();
-        List<InsertedEnumerator> _insertedEnumerators = new List<InsertedEnumerator>();
-        List<AppendedEnumerator> _appendedEnumerators = new List<AppendedEnumerator>();
-        List<CoroutineSequence> _sequences = new List<CoroutineSequence>();
+        List<Coroutine> _coroutines = new();
+        List<InsertedEnumerator> _insertedEnumerators = new();
+        List<AppendedEnumerator> _appendedEnumerators = new();
+        List<CoroutineSequence> _sequences = new();
 
         MonoBehaviour _owner;
         Action _onComplete;
+        bool _isStarted;
 
         public CoroutineSequence(MonoBehaviour owner)
         {
@@ -119,6 +156,10 @@ namespace DouduckLib
 
         public CoroutineSequence Joint(IEnumerator enumerator)
         {
+            if (_appendedEnumerators.Count == 0)
+            {
+                throw new InvalidOperationException("Cannot call Joint before any Append has been added.");
+            }
             var index = _appendedEnumerators.Count - 1;
             _appendedEnumerators[index].AddJointEnumerator(enumerator);
             return this;
@@ -126,6 +167,10 @@ namespace DouduckLib
 
         public CoroutineSequence Joint(Action callback)
         {
+            if (_appendedEnumerators.Count == 0)
+            {
+                throw new InvalidOperationException("Cannot call Joint before any Append has been added.");
+            }
             var index = _appendedEnumerators.Count - 1;
             _appendedEnumerators[index].AddJointEnumerator(GetCallbackEnumerator(callback));
             return this;
@@ -133,6 +178,10 @@ namespace DouduckLib
 
         public CoroutineSequence Joint(CoroutineSequence coroutineSequence)
         {
+            if (_appendedEnumerators.Count == 0)
+            {
+                throw new InvalidOperationException("Cannot call Joint before any Append has been added.");
+            }
             var index = _appendedEnumerators.Count - 1;
             _appendedEnumerators[index].AddJointEnumerator(coroutineSequence.GetEnumerator());
             _sequences.Add(coroutineSequence);
@@ -145,26 +194,34 @@ namespace DouduckLib
             return this;
         }
 
-        public Coroutine StartCoroutine()
+        public CoroutineSequenceYieldInstruction StartCoroutine()
         {
+            if (_isStarted)
+            {
+                Debug.LogWarning("[CoroutineSequence] Sequence has already been started. A CoroutineSequence can only be started once.");
+                return new CoroutineSequenceYieldInstruction(null);
+            }
+            _isStarted = true;
+
+            if (_owner == null)
+            {
+                Debug.LogError("[CoroutineSequence] Cannot start sequence because the owner MonoBehaviour is null.");
+                return new CoroutineSequenceYieldInstruction(null);
+            }
+
             var coroutine = _owner.StartCoroutine(GetEnumerator());
             _coroutines.Add(coroutine);
-            return coroutine;
+            return new CoroutineSequenceYieldInstruction(coroutine);
         }
 
         public void StopCoroutine()
         {
-            for (int i = 0; i < _coroutines.Count; i++)
+            if (_owner != null)
             {
-                _owner.StopCoroutine(_coroutines[i]);
-            }
-            for (int i = 0; i < _insertedEnumerators.Count; i++)
-            {
-                _owner.StopCoroutine(_insertedEnumerators[i].InternalEnumerator);
-            }
-            for (int i = 0; i < _appendedEnumerators.Count; i++)
-            {
-                _owner.StopCoroutine(_appendedEnumerators[i].InternalEnumerator);
+                for (int i = 0; i < _coroutines.Count; i++)
+                {
+                    _owner.StopCoroutine(_coroutines[i]);
+                }
             }
             for (int i = 0; i < _sequences.Count; i++)
             {
@@ -184,7 +241,7 @@ namespace DouduckLib
 
         IEnumerator GetWaitForSecondsEnumerator(float seconds)
         {
-            yield return new WaitForSeconds(seconds);
+            yield return CoroutineUtil.GetWaitForSeconds(seconds);
         }
 
         IEnumerator GetEnumerator()
@@ -197,14 +254,10 @@ namespace DouduckLib
 
             for (int i = 0; i < _appendedEnumerators.Count; i++)
             {
-                _appendedEnumerators[i].StartJointCoroutine(_owner, _coroutines);
-                yield return _appendedEnumerators[i].GetEnumerator();
+                yield return _appendedEnumerators[i].GetEnumerator(_owner, _coroutines);
             }
 
-            if (_onComplete != null)
-            {
-                _onComplete.Invoke();
-            }
+            _onComplete?.Invoke();
         }
     }
 }
