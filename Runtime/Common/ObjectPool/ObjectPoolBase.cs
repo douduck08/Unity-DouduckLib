@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace DouduckLib
 {
-    public abstract class ObjectPoolBase<TObject, TData>
+    [Serializable]
+    public abstract class ObjectPoolBase<TObject>
     {
         [SerializeField] TObject _prefab;
         [SerializeField] int _initialSize;
@@ -15,15 +14,16 @@ namespace DouduckLib
         bool _isInitialized = false;
         Stack<TObject> _inactiveObjects;
         HashSet<TObject> _activeObjects;
+        List<TObject> _tempActiveList;
 
-        Action<TObject> _onCreated;
-        Action<TObject, TData> _onSpawned;
-        Action<TObject> _onDespawned;
-        Action<TObject> _onReleased;
+        public event Action<TObject> OnCreated;
+        public event Action<TObject> OnSpawned;
+        public event Action<TObject> OnDespawned;
+        public event Action<TObject> OnReleased;
 
-        public int ActiveObjectNumber => _activeObjects.Count;
-        public int InactiveObjectNumber => _inactiveObjects.Count;
-        public int TotalObjectNumber => _activeObjects.Count + _inactiveObjects.Count;
+        public int ActiveObjectNumber => _activeObjects?.Count ?? 0;
+        public int InactiveObjectNumber => _inactiveObjects?.Count ?? 0;
+        public int TotalObjectNumber => ActiveObjectNumber + InactiveObjectNumber;
         public bool IsInitialized() => _isInitialized;
 
         protected abstract TObject InstantiateObject(TObject prefab);
@@ -32,19 +32,28 @@ namespace DouduckLib
 
         TObject AllocNew(bool active)
         {
+            if (_prefab == null)
+            {
+                throw new InvalidOperationException("Cannot allocate object because prefab is null. Ensure the pool is properly initialized.");
+            }
             var item = InstantiateObject(_prefab);
-            _onCreated?.Invoke(item);
+            OnCreated?.Invoke(item);
             SetObjectActive(item, active);
             return item;
         }
 
-        public ObjectPoolBase<TObject, TData> InitializePool()
+        public ObjectPoolBase<TObject> InitializePool()
         {
             if (!_isInitialized)
             {
+                if (_prefab == null && _initialSize > 0)
+                {
+                    throw new InvalidOperationException("Cannot pre-warm pool because prefab is null.");
+                }
                 _isInitialized = true;
                 _inactiveObjects = new Stack<TObject>(_initialSize);
                 _activeObjects = new HashSet<TObject>();
+                _tempActiveList = new List<TObject>();
                 for (int i = 0; i < _initialSize; i++)
                 {
                     _inactiveObjects.Push(AllocNew(false));
@@ -53,12 +62,12 @@ namespace DouduckLib
             return this;
         }
 
-        public ObjectPoolBase<TObject, TData> InitializePool(TObject prefab, int initialSize)
+        public ObjectPoolBase<TObject> InitializePool(TObject prefab, int initialSize)
         {
             return InitializePool(prefab, initialSize, 0);
         }
 
-        public ObjectPoolBase<TObject, TData> InitializePool(TObject prefab, int initialSize, int maxSize)
+        public ObjectPoolBase<TObject> InitializePool(TObject prefab, int initialSize, int maxSize)
         {
             _prefab = prefab;
             _initialSize = initialSize;
@@ -66,59 +75,48 @@ namespace DouduckLib
             return InitializePool();
         }
 
-        public ObjectPoolBase<TObject, TData> OnCreated(Action<TObject> onCreatedCallback)
+        public TObject Spawn()
         {
-            _onCreated = onCreatedCallback;
-            return this;
-        }
+            if (!_isInitialized)
+            {
+                InitializePool();
+            }
 
-        public ObjectPoolBase<TObject, TData> OnSpawned(Action<TObject, TData> onSpawnedCallback)
-        {
-            _onSpawned = onSpawnedCallback;
-            return this;
-        }
-
-        public ObjectPoolBase<TObject, TData> OnDespawned(Action<TObject> onDespawnedCallback)
-        {
-            _onDespawned = onDespawnedCallback;
-            return this;
-        }
-
-        public ObjectPoolBase<TObject, TData> OnReleased(Action<TObject> onReleasedCallback)
-        {
-            _onReleased = onReleasedCallback;
-            return this;
-        }
-
-        public TObject Spawn(TData spawnParam)
-        {
-            InitializePool();
+            TObject item;
             if (_inactiveObjects.Count == 0)
             {
-                var item = AllocNew(true);
-                _onSpawned?.Invoke(item, spawnParam);
-                _activeObjects.Add(item);
-                return item;
+                item = AllocNew(true);
             }
             else
             {
-                var item = _inactiveObjects.Pop();
+                item = _inactiveObjects.Pop();
                 SetObjectActive(item, true);
-                _onSpawned?.Invoke(item, spawnParam);
-                _activeObjects.Add(item);
-                return item;
             }
+
+            _activeObjects.Add(item);
+            OnSpawned?.Invoke(item);
+            return item;
         }
 
         public void Despawn(TObject item)
         {
+            if (item == null)
+            {
+                return;
+            }
+
+            if (!_activeObjects.Remove(item))
+            {
+                Debug.LogWarning($"[ObjectPool] Attempted to despawn an object ({item}) that is not active or does not belong to this pool.");
+                return;
+            }
+
             SetObjectActive(item, false);
-            _onDespawned?.Invoke(item);
-            _activeObjects.Remove(item);
+            OnDespawned?.Invoke(item);
 
             if (_maxSize > 0 && _inactiveObjects.Count >= _maxSize)
             {
-                _onReleased?.Invoke(item);
+                OnReleased?.Invoke(item);
                 ReleaseObject(item);
             }
             else
@@ -129,21 +127,19 @@ namespace DouduckLib
 
         public void DespawnAll()
         {
-            while (_activeObjects.Count > 0)
+            if (_activeObjects == null || _activeObjects.Count == 0)
             {
-                var enumerator = _activeObjects.GetEnumerator();
-                if (enumerator.MoveNext())
-                {
-                    var item = enumerator.Current;
-                    enumerator.Dispose();
-                    Despawn(item);
-                }
-                else
-                {
-                    enumerator.Dispose();
-                    break;
-                }
+                return;
             }
+
+            _tempActiveList.Clear();
+            _tempActiveList.AddRange(_activeObjects);
+
+            for (int i = 0; i < _tempActiveList.Count; i++)
+            {
+                Despawn(_tempActiveList[i]);
+            }
+            _tempActiveList.Clear();
         }
 
         public void ReleasePool()
@@ -155,12 +151,13 @@ namespace DouduckLib
                 while (_inactiveObjects.Count > 0)
                 {
                     var item = _inactiveObjects.Pop();
-                    _onReleased?.Invoke(item);
+                    OnReleased?.Invoke(item);
                     ReleaseObject(item);
                 }
 
                 _activeObjects.Clear();
                 _inactiveObjects.Clear();
+                _tempActiveList.Clear();
                 _isInitialized = false;
             }
         }
