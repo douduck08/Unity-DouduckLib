@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -52,7 +52,7 @@ namespace DouduckLib
                 var button = (ButtonAttribute)Attribute.GetCustomAttribute(method, typeof(ButtonAttribute));
                 if (button != null)
                 {
-                    string buttonName = string.IsNullOrEmpty(button.name) ? method.Name : button.name;
+                    string buttonName = string.IsNullOrEmpty(button.name) ? ObjectNames.NicifyVariableName(method.Name) : button.name;
 
                     bool enabledCache = GUI.enabled;
                     GUI.enabled = Application.isPlaying ? button.enableInPlayMode : button.enableInEditMode;
@@ -92,7 +92,7 @@ namespace DouduckLib
                 var button = (ButtonAttribute)Attribute.GetCustomAttribute(method, typeof(ButtonAttribute));
                 if (button != null)
                 {
-                    string buttonName = string.IsNullOrEmpty(button.name) ? method.Name : button.name;
+                    string buttonName = string.IsNullOrEmpty(button.name) ? ObjectNames.NicifyVariableName(method.Name) : button.name;
 
                     bool enabledCache = GUI.enabled;
                     GUI.enabled = Application.isPlaying ? button.enableInPlayMode : button.enableInEditMode;
