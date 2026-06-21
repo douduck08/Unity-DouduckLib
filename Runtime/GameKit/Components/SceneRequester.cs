@@ -29,8 +29,8 @@ namespace DouduckLib
             }
             for (int i = 0; i < scenesToLoad.Count; i++)
             {
-                SceneLoader.Create(true, scenesToLoad[i] == _activeScene)
-                    .AddSceneToLoadByPath(scenesToLoad[i])
+                SceneLoader.Create()
+                    .AddSceneToLoadByPath(scenesToLoad[i], scenesToLoad[i] == _activeScene)
                     .StartProcessing(this);
             }
         }
