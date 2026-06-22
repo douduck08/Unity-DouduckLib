@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEditor;
+using DouduckLib.Localization;
 
-namespace DouduckLib.Localization
+namespace DouduckLibEditor.Localization
 {
     [CustomPropertyDrawer(typeof(LocalizedString))]
     public class LocalizedStringDrawer : PropertyDrawer
@@ -41,7 +42,7 @@ namespace DouduckLib.Localization
             if (previewEnabled)
             {
                 EditorGUI.showMixedValue = keyProp.hasMultipleDifferentValues;
-                var previewText = keyProp.hasMultipleDifferentValues ? "" : Localization.Get().GetString(keyProp.stringValue);
+                var previewText = keyProp.hasMultipleDifferentValues ? "" : DouduckLib.Localization.Localization.Get().GetString(keyProp.stringValue);
                 EditorGUI.TextField(keyRect, previewText);
                 EditorGUI.showMixedValue = false;
             }
@@ -80,7 +81,7 @@ namespace DouduckLib.Localization
             if (GUI.Button(buttonRect, "", EditorStyles.popup))
             {
                 var menu = new GenericMenu();
-                foreach (string fullkey in Localization.Get().GetAllKeys())
+                foreach (string fullkey in DouduckLib.Localization.Localization.Get().GetAllKeys())
                 {
                     var menuPath = fullkey.Replace('.', '/');
                     menu.AddItem(new GUIContent(menuPath), false, OnSelectKey, new MenuItemData(property.serializedObject, keyProp, fullkey));

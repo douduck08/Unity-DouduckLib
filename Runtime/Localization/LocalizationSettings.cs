@@ -32,7 +32,7 @@ namespace DouduckLib.Localization
         }
     }
 
-    [CreateAssetMenu(menuName = "Localization/Localization Editor Settings")]
+    [CreateAssetMenu(menuName = "DouduckLib/Localization/Localization Settings")]
     public sealed class LocalizationSettings : ScriptableObject
     {
         static LocalizationSettings _instance;
