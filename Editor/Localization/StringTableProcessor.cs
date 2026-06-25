@@ -10,7 +10,7 @@ using DouduckLib.Wrapper;
 
 namespace DouduckLibEditor.Localization
 {
-    [CreateAssetMenu(menuName = "DouduckLib/Localization/String Table Processor")]
+    [CreateAssetMenu(menuName = "DouduckLib/Localization - String Table Processor")]
     public class StringTableProcessor : ScriptableObject
     {
         [Serializable]
