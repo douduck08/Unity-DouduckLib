@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using DouduckLib.Localization;
+using DouduckLibEditor;
 
 namespace DouduckLibEditor.Localization
 {
@@ -80,7 +81,7 @@ namespace DouduckLibEditor.Localization
             GUI.enabled = localizedProp.boolValue && !localizedProp.hasMultipleDifferentValues;
             if (GUI.Button(buttonRect, "", EditorStyles.popup))
             {
-                var menu = new GenericMenu();
+                var menu = new SearchableGenericMenu();
                 foreach (string fullkey in DouduckLib.Localization.Localization.Get().GetAllKeys())
                 {
                     var menuPath = fullkey.Replace('.', '/');
@@ -90,7 +91,7 @@ namespace DouduckLibEditor.Localization
                 {
                     menu.AddDisabledItem(new GUIContent("(none)"), false);
                 }
-                menu.ShowAsContext();
+                menu.DropDown(buttonRect);
             }
             GUI.enabled = true;
 
@@ -98,9 +99,8 @@ namespace DouduckLibEditor.Localization
             EditorGUI.EndProperty();
         }
 
-        void OnSelectKey(object userData)
+        void OnSelectKey(MenuItemData data)
         {
-            var data = (MenuItemData)userData;
             data.serializedObject.Update();
             data.keyProperty.stringValue = data.selectedKey;
             data.serializedObject.ApplyModifiedProperties();
