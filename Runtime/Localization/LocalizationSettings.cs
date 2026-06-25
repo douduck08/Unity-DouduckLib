@@ -119,7 +119,7 @@ namespace DouduckLib.Localization
         }
 
         [Button]
-        void Reload()
+        public void ReloadStringTables()
         {
             _instance = this;
             Localization.Get().Initialize(_instance);
