@@ -47,6 +47,9 @@ namespace DouduckLib.Localization
 
         [Header("Localization Settings")]
         [SerializeField] string _defaultLanguageCode = "en-us";
+#if UNITY_EDITOR
+        [SerializeField] string _editorDefaultLanguageCode = "";
+#endif
         [SerializeField] List<LanguageCodeSetting> _languageCodeMappings = new();
         [SerializeField] List<StringTable> _stringTables = new();
 
@@ -60,11 +63,20 @@ namespace DouduckLib.Localization
             if (_instance == null)
             {
                 _instance = this;
-                Localization.Get().Initialize(_instance, _defaultLanguageCode);
+                Localization.Get().Initialize(_instance, GetDefaultLanguageCode());
             }
         }
 
-        public string GetDefaultLanguageCode() => _defaultLanguageCode;
+        public string GetDefaultLanguageCode()
+        {
+#if UNITY_EDITOR
+            if (!Application.isPlaying && !string.IsNullOrEmpty(_editorDefaultLanguageCode))
+            {
+                return _editorDefaultLanguageCode;
+            }
+#endif
+            return _defaultLanguageCode;
+        }
         public IEnumerable<string> GetAllLanguageCode() => _languageCodeMappings.Select(mapping => mapping.languageCode);
 
         public string GetLanguageCode(SystemLanguage systemLanguage)
@@ -122,7 +134,7 @@ namespace DouduckLib.Localization
         public void ReloadStringTables()
         {
             _instance = this;
-            Localization.Get().Initialize(_instance);
+            Localization.Get().Initialize(_instance, GetDefaultLanguageCode());
         }
 #endif
     }
