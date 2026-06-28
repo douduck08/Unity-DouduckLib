@@ -2,7 +2,8 @@
     "name": "com.douduck08.douduck-lib.Runtime",
     "references": [
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Newtonsoft.Json"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
